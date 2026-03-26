@@ -1,12 +1,10 @@
 // --- Config ---
-const API_URL        = 'https://script.google.com/macros/s/AKfycbx_RVF-_Gz1D6aYLd54aVnuVtYea4DMtgqHaZnpOcdBPd_tpAnA33sifXjyFR24cBAR2g/exec';
-const CALLMEBOT_PHONE = '5561992849023';
-const CALLMEBOT_KEY   = 'YOUR_CALLMEBOT_KEY';
+const API_URL = 'https://script.google.com/macros/s/AKfycbx_RVF-_Gz1D6aYLd54aVnuVtYea4DMtgqHaZnpOcdBPd_tpAnA33sifXjyFR24cBAR2g/exec';
 
 // --- State ---
 let slots        = [];
 let selectedSlot = null;
-let adminPass    = '';
+let adminPass    = sessionStorage.getItem('jana-admin-pass') || ''; // Fix 2: persist session
 
 // --- Portuguese labels ---
 const MONTHS       = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -29,11 +27,42 @@ function setTheme(t, btn) {
   localStorage.setItem('jana-theme', t);
 }
 
+// --- Fix 1: Detect system theme on first visit ---
 function initTheme() {
-  const saved = localStorage.getItem('jana-theme') || 'warm';
-  document.documentElement.setAttribute('data-theme', saved);
-  const btn = document.querySelector(`.tbtn[data-theme="${saved}"]`);
+  const saved = localStorage.getItem('jana-theme');
+  let theme;
+  if (saved) {
+    // User has manually chosen before — respect their choice
+    theme = saved;
+  } else {
+    // First visit — use system preference
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    theme = prefersDark ? 'dark' : 'warm';
+  }
+  document.documentElement.setAttribute('data-theme', theme);
+  const btn = document.querySelector(`.tbtn[data-theme="${theme}"]`);
   if (btn) btn.classList.add('active');
+}
+
+// --- Fix 2: Restore admin session on page load ---
+function restoreAdminSession() {
+  if (!adminPass) return;
+  // Silently re-auth and restore admin panel if session exists
+  api({ action: 'adminGetBookings', password: adminPass }).then(data => {
+    if (data.success) {
+      document.getElementById('adminLogin').style.display   = 'none';
+      document.getElementById('adminContent').style.display = 'block';
+      // Only restore if admin panel is open
+      if (document.getElementById('adminPanel').classList.contains('open')) {
+        renderAdminBookings(data.bookings);
+        renderAdminSlots();
+      }
+    } else {
+      // Session invalid — clear it
+      sessionStorage.removeItem('jana-admin-pass');
+      adminPass = '';
+    }
+  }).catch(() => {});
 }
 
 // --- Sticky header shadow ---
@@ -44,6 +73,7 @@ window.addEventListener('scroll', () => {
 // --- Init ---
 initTheme();
 loadSlots();
+restoreAdminSession();
 
 // --- Load slots ---
 async function loadSlots() {
@@ -253,26 +283,6 @@ async function submitBooking() {
     });
 
     if (data.success) {
-      // --- Send WhatsApp notification to Janaína ---
-      const d   = parseDate(selectedSlot.date);
-      const lbl = d
-        ? `${DAYS_FULL[d.getDay()]}, ${d.getDate()} de ${MONTHS[d.getMonth()]} de ${d.getFullYear()} às ${selectedSlot.time}`
-        : `${selectedSlot.day} às ${selectedSlot.time}`;
-
-      const msg = encodeURIComponent(
-        `🗓 Nova reserva!\n\n` +
-        `👤 Nome: ${name}\n` +
-        `📱 WhatsApp: ${whatsapp}\n` +
-        `✉️ Email: ${email}\n` +
-        `📅 Horário: ${lbl}`
-      );
-
-      // --- Fire and forget — don't block the UI ---
-      if (CALLMEBOT_KEY !== 'YOUR_CALLMEBOT_KEY') {
-        fetch(`https://api.callmebot.com/whatsapp.php?phone=${CALLMEBOT_PHONE}&text=${msg}&apikey=${CALLMEBOT_KEY}`)
-          .catch(() => {}); // silent fail — booking already saved
-      }
-
       document.getElementById('bookingForm').style.display   = 'none';
       document.getElementById('successScreen').style.display = 'block';
       document.getElementById('successScreen').scrollIntoView({ behavior: 'smooth' });
@@ -294,7 +304,20 @@ async function submitBooking() {
 
 // --- Admin ---
 function toggleAdmin() {
-  document.getElementById('adminPanel').classList.toggle('open');
+  const panel = document.getElementById('adminPanel');
+  panel.classList.toggle('open');
+
+  // --- Fix 2: If session exists and panel just opened, restore UI ---
+  if (panel.classList.contains('open') && adminPass) {
+    api({ action: 'adminGetBookings', password: adminPass }).then(data => {
+      if (data.success) {
+        document.getElementById('adminLogin').style.display   = 'none';
+        document.getElementById('adminContent').style.display = 'block';
+        renderAdminBookings(data.bookings);
+        renderAdminSlots();
+      }
+    }).catch(() => {});
+  }
 }
 
 async function adminAuth() {
@@ -303,7 +326,9 @@ async function adminAuth() {
   try {
     const data = await api({ action: 'adminGetBookings', password: pw });
     if (data.success) {
+      // --- Fix 2: Save session so refresh doesn't log out ---
       adminPass = pw;
+      sessionStorage.setItem('jana-admin-pass', pw);
       document.getElementById('adminLogin').style.display   = 'none';
       document.getElementById('adminContent').style.display = 'block';
       renderAdminBookings(data.bookings);
@@ -347,6 +372,11 @@ function renderAdminBookings(bookings) {
 }
 
 async function toggleSlotStatus(id, currentStatus) {
+  // --- Fix 3: Prevent double-click ---
+  const btn = event.target;
+  btn.disabled    = true;
+  btn.textContent = 'Processando...';
+
   const newStatus = currentStatus === 'available' ? 'booked' : 'available';
   try {
     const data = await api({ action: 'adminUpdateSlot', password: adminPass, slotId: id, status: newStatus });
@@ -355,8 +385,15 @@ async function toggleSlotStatus(id, currentStatus) {
       if (s) s.status = newStatus;
       renderCalendar();
       renderAdminSlots();
+    } else {
+      btn.disabled    = false;
+      btn.textContent = currentStatus === 'available' ? 'Bloquear' : 'Liberar';
     }
-  } catch(e) { alert('Erro ao atualizar horário.'); }
+  } catch(e) {
+    alert('Erro ao atualizar horário.');
+    btn.disabled    = false;
+    btn.textContent = currentStatus === 'available' ? 'Bloquear' : 'Liberar';
+  }
 }
 
 async function addSlot() {
@@ -365,8 +402,13 @@ async function addSlot() {
   const date  = document.getElementById('newSlotDate').value.trim();
   const time  = document.getElementById('newSlotTime').value.trim();
   const msgEl = document.getElementById('addSlotMsg');
+  const btn   = event.target;
 
   if (!id || !day || !date || !time) { showMsg(msgEl, 'error', 'Preencha todos os campos.'); return; }
+
+  // --- Fix 3: Prevent double-click ---
+  btn.disabled    = true;
+  btn.textContent = 'Processando...';
 
   try {
     const data = await api({ action: 'adminAddSlot', password: adminPass, id, day, time, date });
@@ -387,6 +429,10 @@ async function addSlot() {
       showMsg(msgEl, 'success', 'Horário adicionado!');
     } else { showMsg(msgEl, 'error', data.error || 'Erro ao adicionar.'); }
   } catch(e) { showMsg(msgEl, 'error', 'Erro de conexão.'); }
+  finally {
+    btn.disabled    = false;
+    btn.textContent = '+ Adicionar horário';
+  }
 }
 
 // --- Helper ---
