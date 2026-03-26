@@ -411,15 +411,130 @@ function renderAdminSlots() {
     const lbl = d
       ? `${d.getDate()} de ${MONTHS[d.getMonth()]} de ${d.getFullYear()} · ${slot.time}`
       : `${slot.day} · ${slot.time}`;
-    return `<div class="admin-slot-row">
-      <span><strong>${slot.day}</strong> — ${lbl}</span>
-      <span class="slot-status-pill ${slot.status}">${slot.status === 'available' ? 'Livre' : 'Reservado'}</span>
-      <button class="btn-small ${slot.status === 'available' ? 'danger' : 'success-btn'}"
-              onclick="toggleSlotStatus('${slot.id}','${slot.status}')">
-        ${slot.status === 'available' ? 'Bloquear' : 'Liberar'}
-      </button>
-    </div>`;
+    return `
+      <div class="admin-slot-row" id="row-${slot.id}">
+        <span class="admin-slot-label"><strong>${slot.day}</strong> — ${lbl}</span>
+        <span class="slot-status-pill ${slot.status}">${slot.status === 'available' ? 'Livre' : 'Reservado'}</span>
+        <div class="admin-slot-actions">
+          <button class="btn-small ${slot.status === 'available' ? 'danger' : 'success-btn'}"
+                  onclick="toggleSlotStatus('${slot.id}','${slot.status}')">
+            ${slot.status === 'available' ? 'Bloquear' : 'Liberar'}
+          </button>
+          <button class="btn-icon btn-edit" title="Editar" onclick="startEditSlot('${slot.id}')">✏️</button>
+          <button class="btn-icon btn-delete" title="Deletar" onclick="startDeleteSlot('${slot.id}')">🗑️</button>
+        </div>
+      </div>`;
   }).join('');
+}
+
+// --- Generate time options with current selected ---
+function getTimeOptions(selectedVal) {
+  let html = '<option value="">Selecione...</option>';
+  for (let h = 6; h < 23; h++) {
+    for (let m = 0; m < 60; m += 15) {
+      const hh  = String(h).padStart(2, '0');
+      const mm  = String(m).padStart(2, '0');
+      const val = `${hh}:${mm}`;
+      const lbl = `${hh}h${mm === '00' ? '' : mm}`;
+      const sel = val === selectedVal ? 'selected' : '';
+      html += `<option value="${val}" ${sel}>${lbl}</option>`;
+    }
+  }
+  return html;
+}
+
+// --- Start inline edit ---
+function startEditSlot(id) {
+  const slot = slots.find(s => s.id === id);
+  if (!slot) return;
+  const dateVal = slot.date || '';
+  // --- Convert display time back to HH:MM for select ---
+  let timeVal = slot.time.replace('h', ':');
+  if (!timeVal.includes(':')) timeVal += ':00';
+  if (timeVal.split(':')[0].length === 1) timeVal = '0' + timeVal;
+  if (timeVal.split(':')[1] === undefined || timeVal.split(':')[1] === '') timeVal += '00';
+
+  const row = document.getElementById(`row-${id}`);
+  row.innerHTML = `
+    <div class="admin-edit-row">
+      <input type="date" id="edit-date-${id}" value="${dateVal}" onchange="onEditDateChange('${id}')"/>
+      <select id="edit-time-${id}" onchange="onEditDateChange('${id}')">${getTimeOptions(timeVal)}</select>
+      <input type="text" id="edit-day-${id}"  value="${slot.day}" disabled/>
+      <input type="text" id="edit-id-${id}"   value="${id}" disabled style="font-size:10px;"/>
+      <button class="btn-small success-btn" onclick="saveEditSlot('${id}')">✓ Salvar</button>
+      <button class="btn-small" style="background:var(--muted)" onclick="renderAdminSlots()">✗ Cancelar</button>
+    </div>`;
+}
+
+// --- Auto-update day and ID when edit date/time changes ---
+function onEditDateChange(id) {
+  const dateVal = document.getElementById(`edit-date-${id}`).value;
+  const timeEl  = document.getElementById(`edit-time-${id}`);
+  const timeVal = timeEl ? timeEl.value : '';
+  if (!dateVal) return;
+  const d       = parseDate(dateVal);
+  const dayName = DAYS_FULL[d.getDay()].split('-')[0];
+  document.getElementById(`edit-day-${id}`).value = dayName;
+  if (timeVal) {
+    document.getElementById(`edit-id-${id}`).value = `${dateVal}-${formatTimeDisplay(timeVal)}`;
+  }
+}
+
+// --- Save inline edit ---
+async function saveEditSlot(oldId) {
+  const dateVal = document.getElementById(`edit-date-${oldId}`).value;
+  const timeVal = document.getElementById(`edit-time-${oldId}`).value;
+  if (!dateVal || !timeVal) { alert('Selecione data e horário.'); return; }
+
+  const newTime = formatTimeDisplay(timeVal);
+  const d       = parseDate(dateVal);
+  const newDay  = DAYS_FULL[d.getDay()].split('-')[0];
+  const newId   = `${dateVal}-${newTime}`;
+
+  const btn = event.target;
+  btn.disabled = true; btn.textContent = 'Salvando...';
+
+  try {
+    const data = await api({
+      action: 'adminEditSlot', password: adminPass,
+      oldId, newId, newDay, newTime, newDate: dateVal
+    });
+    if (data.success) {
+      const s = slots.find(s => s.id === oldId);
+      if (s) { s.id = newId; s.day = newDay; s.time = newTime; s.date = dateVal; }
+      renderCalendar();
+      renderAdminSlots();
+    } else { alert(data.error || 'Erro ao editar.'); btn.disabled = false; btn.textContent = '✓ Salvar'; }
+  } catch(e) { alert('Erro de conexão.'); btn.disabled = false; btn.textContent = '✓ Salvar'; }
+}
+
+// --- Start inline delete confirmation ---
+function startDeleteSlot(id) {
+  const slot = slots.find(s => s.id === id);
+  if (!slot) return;
+  const d   = parseDate(slot.date);
+  const lbl = d ? `${d.getDate()} de ${MONTHS[d.getMonth()]} · ${slot.time}` : slot.time;
+  const row = document.getElementById(`row-${id}`);
+  row.innerHTML = `
+    <span style="font-size:13px;color:var(--error);">Deletar <strong>${slot.day} — ${lbl}</strong>? Não pode ser desfeito.</span>
+    <div class="admin-slot-actions">
+      <button class="btn-small danger" onclick="confirmDeleteSlot('${id}')">Sim, deletar</button>
+      <button class="btn-small" style="background:var(--muted)" onclick="renderAdminSlots()">Cancelar</button>
+    </div>`;
+}
+
+// --- Confirm and execute delete ---
+async function confirmDeleteSlot(id) {
+  const btn = event.target;
+  btn.disabled = true; btn.textContent = 'Deletando...';
+  try {
+    const data = await api({ action: 'adminDeleteSlot', password: adminPass, slotId: id });
+    if (data.success) {
+      slots = slots.filter(s => s.id !== id);
+      renderCalendar();
+      renderAdminSlots();
+    } else { alert(data.error || 'Erro ao deletar.'); btn.disabled = false; btn.textContent = 'Sim, deletar'; }
+  } catch(e) { alert('Erro de conexão.'); btn.disabled = false; btn.textContent = 'Sim, deletar'; }
 }
 
 function renderAdminBookings(bookings) {
