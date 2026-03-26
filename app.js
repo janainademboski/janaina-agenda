@@ -1,7 +1,7 @@
 // --- Config ---
 const API_URL        = 'https://script.google.com/macros/s/AKfycbxHn1PxzGAmcmACd9Wad6OXk6rQYTySr40XFK2ckH2LPXz_chPDAdpyF4eN9BJ9Ifc/exec';
-const CALLMEBOT_PHONE = '5561992849023'; // Janaína's WhatsApp number (with country code, no +)
-const CALLMEBOT_KEY   = 'YOUR_CALLMEBOT_KEY'; // Replace with her CallMeBot API key
+const CALLMEBOT_PHONE = '5561992849023';
+const CALLMEBOT_KEY   = 'YOUR_CALLMEBOT_KEY';
 
 // --- State ---
 let slots        = [];
@@ -13,6 +13,13 @@ const MONTHS       = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Jul
 const MONTHS_SHORT = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 const DAYS_FULL    = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
 const DAY_SHORT    = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+
+// --- API helper: all requests via GET params to avoid CORS ---
+async function api(params) {
+  const url = API_URL + '?' + new URLSearchParams(params).toString();
+  const res  = await fetch(url, { redirect: 'follow' });
+  return res.json();
+}
 
 // --- Theme ---
 function setTheme(t, btn) {
@@ -41,8 +48,7 @@ loadSlots();
 // --- Load slots ---
 async function loadSlots() {
   try {
-    const res  = await fetch(`${API_URL}?action=getSlots`);
-    const data = await res.json();
+    const data = await api({ action: 'getSlots' });
     slots = (data.slots || []).sort((a, b) => {
       const da = parseDate(a.date), db = parseDate(b.date);
       if (!da) return 1; if (!db) return -1;
@@ -240,11 +246,11 @@ async function submitBooking() {
   btn.disabled = true; btn.textContent = 'Confirmando...';
 
   try {
-    const res  = await fetch(API_URL, {
-      method: 'POST',
-      body: JSON.stringify({ action: 'bookSlot', slotId: selectedSlot.id, name, whatsapp, email })
+    const data = await api({
+      action: 'bookSlot',
+      slotId: selectedSlot.id,
+      name, whatsapp, email
     });
-    const data = await res.json();
 
     if (data.success) {
       // --- Send WhatsApp notification to Janaína ---
@@ -295,8 +301,7 @@ async function adminAuth() {
   const pw    = document.getElementById('adminPassword').value;
   const msgEl = document.getElementById('adminLoginMsg');
   try {
-    const res  = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'adminGetBookings', password: pw }) });
-    const data = await res.json();
+    const data = await api({ action: 'adminGetBookings', password: pw });
     if (data.success) {
       adminPass = pw;
       document.getElementById('adminLogin').style.display   = 'none';
@@ -344,8 +349,7 @@ function renderAdminBookings(bookings) {
 async function toggleSlotStatus(id, currentStatus) {
   const newStatus = currentStatus === 'available' ? 'booked' : 'available';
   try {
-    const res  = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'adminUpdateSlot', password: adminPass, slotId: id, status: newStatus }) });
-    const data = await res.json();
+    const data = await api({ action: 'adminUpdateSlot', password: adminPass, slotId: id, status: newStatus });
     if (data.success) {
       const s = slots.find(s => s.id === id);
       if (s) s.status = newStatus;
@@ -365,8 +369,7 @@ async function addSlot() {
   if (!id || !day || !date || !time) { showMsg(msgEl, 'error', 'Preencha todos os campos.'); return; }
 
   try {
-    const res  = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'adminAddSlot', password: adminPass, id, day, time, date }) });
-    const data = await res.json();
+    const data = await api({ action: 'adminAddSlot', password: adminPass, id, day, time, date });
     if (data.success) {
       slots.push({ id, day, time, date, status: 'available' });
       slots.sort((a, b) => {
