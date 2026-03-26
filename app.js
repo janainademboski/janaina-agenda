@@ -1,5 +1,5 @@
 // --- Config ---
-const API_URL = 'https://script.google.com/macros/s/AKfycbyvVsr7N9pGp4DnTeiB-Y7WuJhTA5DiqOtkAt6wzg1WuOTt_Lna-u3gwBhin6wfBsZiVQ/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbyVRO3bpA9zwfLpvXxJslUbXSmZJLkXwihAPnAQfQppB5O6we4Du5TA5cGbNyYGmQMHTA/exec';
 
 // --- State ---
 let slots        = [];
@@ -279,6 +279,14 @@ function selectSlot(id) {
   }
 }
 
+// --- Reset booking form for a new booking ---
+function resetBooking() {
+  document.getElementById('successScreen').style.display = 'none';
+  document.getElementById('bookingForm').style.display   = 'none';
+  selectedSlot = null;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 // --- Validation ---
 function validateName() {
   const input = document.getElementById('fieldName');
@@ -344,6 +352,17 @@ async function submitBooking() {
     });
 
     if (data.success) {
+      // --- Reset form fields ---
+      document.getElementById('fieldName').value     = '';
+      document.getElementById('fieldWhatsapp').value = '';
+      document.getElementById('fieldEmail').value    = '';
+      document.getElementById('fieldMessage').value  = '';
+      document.getElementById('fieldName').classList.remove('valid', 'invalid');
+      document.getElementById('fieldWhatsapp').classList.remove('valid', 'invalid');
+      document.getElementById('fieldEmail').classList.remove('valid', 'invalid');
+      document.getElementById('formMessage').style.display = 'none';
+      btn.disabled = false; btn.textContent = 'Confirmar agendamento';
+
       document.getElementById('bookingForm').style.display   = 'none';
       document.getElementById('successScreen').style.display = 'block';
       document.getElementById('successScreen').scrollIntoView({ behavior: 'smooth' });
@@ -539,18 +558,23 @@ async function confirmDeleteSlot(id) {
 
 function formatTimestamp(ts) {
   if (!ts) return '—';
-  // --- Handle ISO format (2026-03-26T16:58:25.000Z) ---
-  const iso = String(ts);
-  if (iso.includes('T')) {
-    const d = new Date(iso);
+  const s = String(ts).trim();
+  // --- ISO format: 2026-03-26T16:58:25.000Z ---
+  if (s.includes('T') || s.includes('Z')) {
+    const d = new Date(s);
     if (!isNaN(d)) {
-      return d.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo',
-        day: '2-digit', month: '2-digit', year: 'numeric',
-        hour: '2-digit', minute: '2-digit' });
+      return d.toLocaleString('pt-BR', {
+        timeZone  : 'America/Sao_Paulo',
+        day       : '2-digit',
+        month     : '2-digit',
+        year      : 'numeric',
+        hour      : '2-digit',
+        minute    : '2-digit'
+      });
     }
   }
-  // --- Already formatted (26/03/2026, 16:58) ---
-  return ts;
+  // --- Already formatted (26/03/2026, 14:08) --- return as-is
+  return s;
 }
 
 function renderAdminBookings(bookings) {

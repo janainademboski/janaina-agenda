@@ -684,6 +684,26 @@ body::before {
   transition : color 0.3s;
 }
 
+.btn-new-booking {
+  margin-top    : 20px;
+  padding       : 10px 24px;
+  background    : none;
+  border        : 1.5px solid var(--success);
+  color         : var(--success);
+  border-radius : 20px;
+  font-family   : 'Inter', sans-serif;
+  font-size     : 12px;
+  font-weight   : 500;
+  letter-spacing: 0.08em;
+  cursor        : pointer;
+  transition    : all 0.2s;
+}
+
+.btn-new-booking:hover {
+  background: var(--success);
+  color     : #fff;
+}
+
 /* ============================================================
    FOOTER
    ============================================================ */
