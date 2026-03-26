@@ -290,13 +290,23 @@ body::before {
   color     : var(--purple);
 }
 
-.header-logo-link {
+.header-logo-link,
+.header-logo-link:link,
+.header-logo-link:visited,
+.header-logo-link:hover,
+.header-logo-link:active,
+.header-logo-link:focus {
   text-decoration: none;
   color          : inherit;
   cursor         : pointer;
+  outline        : none;
 }
 
-.header-logo-link em {
+.header-logo-link em,
+.header-logo-link:link em,
+.header-logo-link:visited em,
+.header-logo-link:hover em,
+.header-logo-link:active em {
   color: var(--purple);
 }
 
