@@ -146,6 +146,7 @@
       padding: 16px;
     }
 
+    /* --- Day cell --- */
     .day-cell {
       display: flex;
       flex-direction: column;
@@ -155,30 +156,8 @@
       min-height: 100px;
     }
 
-    .day-cell.has-slot {
-      cursor: pointer;
+    .day-cell.has-slots {
       border: 1.5px solid var(--soft-taupe);
-      transition: all 0.2s ease;
-    }
-
-    .day-cell.has-slot:hover:not(.booked):not(.selected) {
-      border-color: var(--accent);
-      box-shadow: var(--shadow);
-      transform: translateY(-2px);
-      background: var(--warm-white);
-    }
-
-    .day-cell.selected {
-      border: 1.5px solid var(--purple);
-      background: rgba(124,107,158,0.06);
-      box-shadow: 0 0 0 3px rgba(124,107,158,0.12);
-    }
-
-    .day-cell.booked {
-      border: 1.5px solid var(--soft-taupe);
-      background: var(--warm-white);
-      cursor: not-allowed;
-      opacity: 0.5;
     }
 
     .day-cell.empty {
@@ -192,7 +171,7 @@
       letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--muted);
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .day-date-num {
@@ -211,28 +190,64 @@
       margin-bottom: 8px;
     }
 
-    .day-time {
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--accent);
-      margin-bottom: 4px;
+    /* --- Time slot buttons inside cell --- */
+    .slot-btn {
+      width: 100%;
+      margin-bottom: 5px;
+      padding: 5px 4px;
+      border-radius: 6px;
+      border: 1.5px solid var(--soft-taupe);
+      background: var(--cream);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.18s ease;
+      font-family: 'Jost', sans-serif;
     }
 
-    .day-cell.selected .day-time { color: var(--purple); }
-    .day-cell.booked   .day-time { color: var(--muted); }
+    .slot-btn:last-child { margin-bottom: 0; }
 
-    .day-badge {
+    .slot-btn.available:hover {
+      border-color: var(--accent);
+      background: var(--warm-white);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+    }
+
+    .slot-btn.selected {
+      border-color: var(--purple);
+      background: rgba(124,107,158,0.08);
+      box-shadow: 0 0 0 2px rgba(124,107,158,0.15);
+    }
+
+    .slot-btn.booked {
+      opacity: 0.45;
+      cursor: not-allowed;
+      background: var(--warm-white);
+    }
+
+    .slot-time-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--accent);
+      display: block;
+      line-height: 1.3;
+    }
+
+    .slot-btn.selected  .slot-time-label { color: var(--purple); }
+    .slot-btn.booked    .slot-time-label { color: var(--muted); }
+
+    .slot-status-label {
       font-size: 9px;
       font-weight: 500;
       letter-spacing: 0.06em;
       text-transform: uppercase;
-      padding: 2px 8px;
-      border-radius: 20px;
+      display: block;
+      line-height: 1.3;
     }
 
-    .day-badge.available { background: rgba(90,138,106,0.12);  color: var(--success); }
-    .day-badge.booked    { background: rgba(158,145,133,0.15); color: var(--muted); }
-    .day-badge.selected  { background: rgba(124,107,158,0.18); color: var(--purple); }
+    .slot-btn.available .slot-status-label { color: var(--success); }
+    .slot-btn.selected  .slot-status-label { color: var(--purple); }
+    .slot-btn.booked    .slot-status-label { color: var(--muted); }
 
     /* --- Booking form --- */
     .booking-form {
@@ -370,9 +385,34 @@
       border-top: 1px solid var(--soft-taupe);
     }
 
-    .footer p { font-size: 12px; color: var(--muted); font-weight: 300; }
-    .footer a  { color: var(--accent); text-decoration: none; font-weight: 400; }
-    .footer a:hover { text-decoration: underline; }
+    .footer-links {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .footer-link {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 300;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-link:hover { color: var(--accent); }
+
+    .footer-link svg { flex-shrink: 0; }
+
+    .footer-sep {
+      width: 1px;
+      height: 14px;
+      background: var(--soft-taupe);
+    }
 
     /* --- Admin --- */
     .admin-toggle { text-align: center; margin-top: 32px; }
@@ -444,8 +484,8 @@
       white-space: nowrap;
     }
 
-    .btn-small:hover      { background: var(--accent-dark); }
-    .btn-small.danger     { background: var(--error); }
+    .btn-small:hover       { background: var(--accent-dark); }
+    .btn-small.danger      { background: var(--error); }
     .btn-small.success-btn { background: var(--success); }
 
     .admin-slot-row {
@@ -540,9 +580,9 @@
         gap: 6px;
         padding: 12px;
       }
-      .fields-row        { grid-template-columns: 1fr; }
-      .add-slot-inputs   { grid-template-columns: 1fr 1fr; }
-      .day-date-num      { font-size: 1.2rem; }
+      .fields-row      { grid-template-columns: 1fr; }
+      .add-slot-inputs { grid-template-columns: 1fr 1fr; }
+      .day-date-num    { font-size: 1.2rem; }
     }
 
     @media (max-width: 380px) {
@@ -599,7 +639,23 @@
 
   <!-- Footer -->
   <div class="footer">
-    <p>📱 <a href="https://wa.me/5561992849023">61 99284-9023</a> &nbsp;·&nbsp; @psi.janainspira</p>
+    <div class="footer-links">
+      <a class="footer-link" href="https://wa.me/5561992849023" target="_blank" rel="noopener">
+        <!-- WhatsApp icon -->
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" fill="currentColor"/>
+        </svg>
+        61 99284-9023
+      </a>
+      <div class="footer-sep"></div>
+      <a class="footer-link" href="https://www.instagram.com/psi.janainspira" target="_blank" rel="noopener">
+        <!-- Instagram icon -->
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" fill="currentColor"/>
+        </svg>
+        @psi.janainspira
+      </a>
+    </div>
   </div>
 
   <!-- Admin -->
@@ -627,7 +683,7 @@
       <div class="add-slot-form">
         <h4>Adicionar novo horário</h4>
         <div class="add-slot-inputs">
-          <input type="text" id="newSlotId"   placeholder="ID (ex: ter-01abr)"/>
+          <input type="text" id="newSlotId"   placeholder="ID (ex: ter-01abr-20h)"/>
           <input type="text" id="newSlotDay"  placeholder="Dia (ex: Terça)"/>
           <input type="date" id="newSlotDate"/>
           <input type="text" id="newSlotTime" placeholder="Hora (ex: 20h)"/>
@@ -646,7 +702,7 @@
 </div>
 <script>
   // --- Config ---
-  const API_URL = 'https://script.google.com/macros/s/AKfycbwr1Qy87oeFdHObXT2leYWA5X-FXmu3lSa4j-Kcfx9Tla5w4X1FpQaRYJR2C0CYoPMeiw/exec';
+  const API_URL = 'https://script.google.com/macros/s/AKfycbz6ZMwQclyfWQAon4Isp9RoLQB70CYhVwNDAZCSfmm3a6oRONcB5mtzabxJZ_2h4op2/exec';
 
   // --- State ---
   let slots        = [];
@@ -662,27 +718,27 @@
   // --- Init ---
   loadSlots();
 
-  // --- Load slots from API ---
   async function loadSlots() {
     try {
       const res  = await fetch(`${API_URL}?action=getSlots`);
       const data = await res.json();
       slots = (data.slots || []).sort((a, b) => {
-        if (!a.date) return 1;
-        if (!b.date) return -1;
-        return new Date(a.date) - new Date(b.date);
+        const da = parseDate(a.date), db = parseDate(b.date);
+        if (!da) return 1; if (!db) return -1;
+        if (da - db !== 0) return da - db;
+        // Same date — sort by time string
+        return (a.time || '').localeCompare(b.time || '');
       });
       renderCalendar();
-    } catch (e) {
+    } catch(e) {
       document.getElementById('calendarContainer').innerHTML =
         `<div class="empty-state">Não foi possível carregar os horários. Tente novamente.</div>`;
     }
   }
 
-  // --- Parse date string safely (handles YYYY-MM-DD) ---
+  // --- Parse date safely as local (no UTC shift) ---
   function parseDate(str) {
     if (!str) return null;
-    // Force parse as local date to avoid timezone shifts
     const s = String(str).trim();
     const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
     if (m) return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
@@ -690,41 +746,38 @@
     return isNaN(d) ? null : d;
   }
 
-  // --- Get Monday of the week containing date d ---
   function getMonday(d) {
     const date = new Date(d);
-    const dow  = date.getDay(); // 0=Sun
+    const dow  = date.getDay();
     const diff = (dow === 0) ? -6 : 1 - dow;
     date.setDate(date.getDate() + diff);
     return date;
   }
 
-  // --- Format week label ---
   function formatWeekLabel(monday) {
     const sat = new Date(monday);
     sat.setDate(monday.getDate() + 5);
     const d1 = monday.getDate(), m1 = monday.getMonth(), y1 = monday.getFullYear();
-    const d2 = sat.getDate(),    m2 = sat.getMonth(),    y2 = sat.getFullYear();
-    if (m1 === m2 && y1 === y2) return `${d1} – ${d2} de ${MONTHS[m1]} de ${y1}`;
-    return `${d1} ${MONTHS_SHORT[m1]} – ${d2} ${MONTHS_SHORT[m2]} ${y2}`;
+    const d2 = sat.getDate(),    m2 = sat.getMonth();
+    if (m1 === m2 && y1 === sat.getFullYear()) return `${d1} – ${d2} de ${MONTHS[m1]} de ${y1}`;
+    return `${d1} ${MONTHS_SHORT[m1]} – ${d2} ${MONTHS_SHORT[m2]} ${sat.getFullYear()}`;
   }
 
   // --- Render weekly calendar ---
   function renderCalendar() {
     const container = document.getElementById('calendarContainer');
-
     if (!slots.length) {
       container.innerHTML = `<div class="empty-state">Nenhum horário disponível no momento.</div>`;
       return;
     }
 
-    // Group slots by week key (Monday date string)
+    // --- Group by week ---
     const weekMap = new Map();
     slots.forEach(slot => {
       const d = parseDate(slot.date);
       if (!d) return;
       const mon = getMonday(d);
-      const key = `${mon.getFullYear()}-${mon.getMonth()}-${mon.getDate()}`;
+      const key = `${mon.getFullYear()}-${String(mon.getMonth()).padStart(2,'0')}-${String(mon.getDate()).padStart(2,'0')}`;
       if (!weekMap.has(key)) weekMap.set(key, { monday: mon, slots: [] });
       weekMap.get(key).slots.push({ ...slot, parsedDate: d });
     });
@@ -734,10 +787,9 @@
       return;
     }
 
-    // Mon=1 ... Sat=6 (we skip Sun=0)
-    const COL_DAYS = [1, 2, 3, 4, 5, 6];
-
+    const COL_DAYS = [1, 2, 3, 4, 5, 6]; // Mon–Sat
     let html = '';
+
     weekMap.forEach(({ monday, slots: wSlots }) => {
       html += `<div class="week-block"><div class="week-header">Semana de ${formatWeekLabel(monday)}</div><div class="calendar-grid">`;
 
@@ -745,32 +797,39 @@
         const cellDate = new Date(monday);
         cellDate.setDate(monday.getDate() + (dow - 1));
 
-        const slot = wSlots.find(s =>
+        // --- Find ALL slots for this day ---
+        const daySlots = wSlots.filter(s =>
           s.parsedDate.getFullYear() === cellDate.getFullYear() &&
           s.parsedDate.getMonth()    === cellDate.getMonth()    &&
           s.parsedDate.getDate()     === cellDate.getDate()
         );
 
-        const dayLabel  = DAY_SHORT[dow];
-        const dateNum   = cellDate.getDate();
-        const monthStr  = MONTHS_SHORT[cellDate.getMonth()];
+        const dayLabel = DAY_SHORT[dow];
+        const dateNum  = cellDate.getDate();
+        const monthStr = MONTHS_SHORT[cellDate.getMonth()];
 
-        if (slot) {
-          const isBooked   = slot.status === 'booked';
-          const isSelected = selectedSlot && selectedSlot.id === slot.id;
-          const cls        = isBooked ? 'booked' : isSelected ? 'selected' : 'has-slot';
-          const badge      = isBooked ? 'booked' : isSelected ? 'selected' : 'available';
-          const badgeTxt   = isBooked ? 'Ocupado' : isSelected ? 'Selecionado' : 'Livre';
-          const click      = isBooked ? '' : `onclick="selectSlot('${slot.id}')"`;
-
+        if (daySlots.length) {
           html += `
-            <div class="day-cell ${cls}" ${click}>
+            <div class="day-cell has-slots">
               <div class="day-name">${dayLabel}</div>
               <div class="day-date-num">${dateNum}</div>
-              <div class="day-month">${monthStr}</div>
-              <div class="day-time">${slot.time}</div>
-              <div class="day-badge ${badge}">${badgeTxt}</div>
-            </div>`;
+              <div class="day-month">${monthStr}</div>`;
+
+          daySlots.forEach(slot => {
+            const isBooked   = slot.status === 'booked';
+            const isSelected = selectedSlot && selectedSlot.id === slot.id;
+            const cls        = isBooked ? 'booked' : isSelected ? 'selected' : 'available';
+            const statusTxt  = isBooked ? 'Ocupado' : isSelected ? 'Selecionado' : 'Livre';
+            const click      = isBooked ? '' : `onclick="selectSlot('${slot.id}')"`;
+
+            html += `
+              <button class="slot-btn ${cls}" ${click}>
+                <span class="slot-time-label">${slot.time}</span>
+                <span class="slot-status-label">${statusTxt}</span>
+              </button>`;
+          });
+
+          html += `</div>`;
         } else {
           html += `
             <div class="day-cell empty">
@@ -872,7 +931,9 @@
     if (!slots.length) { el.innerHTML = '<p style="font-size:13px;color:var(--muted);">Nenhum horário cadastrado.</p>'; return; }
     el.innerHTML = slots.map(slot => {
       const d   = parseDate(slot.date);
-      const lbl = d ? `${d.getDate()} de ${MONTHS[d.getMonth()]} de ${d.getFullYear()} · ${slot.time}` : `${slot.day} · ${slot.time}`;
+      const lbl = d
+        ? `${d.getDate()} de ${MONTHS[d.getMonth()]} de ${d.getFullYear()} · ${slot.time}`
+        : `${slot.day} · ${slot.time}`;
       return `
         <div class="admin-slot-row">
           <span><strong>${slot.day}</strong> — ${lbl}</span>
@@ -928,11 +989,16 @@
       const data = await res.json();
       if (data.success) {
         slots.push({ id, day, time, date, status:'available' });
-        slots.sort((a,b) => { if(!a.date) return 1; if(!b.date) return -1; return new Date(a.date)-new Date(b.date); });
+        slots.sort((a, b) => {
+          const da = parseDate(a.date), db = parseDate(b.date);
+          if (!da) return 1; if (!db) return -1;
+          if (da - db !== 0) return da - db;
+          return (a.time || '').localeCompare(b.time || '');
+        });
         renderCalendar();
         renderAdminSlots();
-        document.getElementById('newSlotId').value = '';
-        document.getElementById('newSlotDay').value = '';
+        document.getElementById('newSlotId').value   = '';
+        document.getElementById('newSlotDay').value  = '';
         document.getElementById('newSlotDate').value = '';
         document.getElementById('newSlotTime').value = '';
         showMsg(msgEl,'success','Horário adicionado!');
