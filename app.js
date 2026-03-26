@@ -503,10 +503,13 @@ function startEditSlot(id) {
   if (timeVal.split(':')[0].length === 1) timeVal = '0' + timeVal;
   if (timeVal.split(':')[1] === undefined || timeVal.split(':')[1] === '') timeVal += '00';
 
+  const today  = new Date();
+  const minVal = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
   const row = document.getElementById(`row-${id}`);
   row.innerHTML = `
     <div class="admin-edit-row">
-      <input type="date" id="edit-date-${id}" value="${dateVal}" onchange="onEditDateChange('${id}')"/>
+      <input type="date" id="edit-date-${id}" value="${dateVal}" min="${minVal}" onchange="onEditDateChange('${id}')"/>
       <select id="edit-time-${id}" onchange="onEditDateChange('${id}')">${getTimeOptions(timeVal)}</select>
       <input type="text" id="edit-day-${id}"  value="${slot.day}" disabled/>
       <input type="text" id="edit-id-${id}"   value="${id}" disabled style="font-size:10px;"/>
@@ -534,6 +537,23 @@ async function saveEditSlot(oldId) {
   const dateVal = document.getElementById(`edit-date-${oldId}`).value;
   const timeVal = document.getElementById(`edit-time-${oldId}`).value;
   if (!dateVal || !timeVal) { alert('Selecione data e horário.'); return; }
+
+  // --- Validate date is not in the past ---
+  const selectedDate = parseDate(dateVal);
+  const now          = new Date();
+  const today        = new Date(); today.setHours(0,0,0,0);
+  if (selectedDate < today) {
+    alert('Não é possível editar para uma data passada.');
+    return;
+  }
+  if (selectedDate.getTime() === today.getTime()) {
+    const [hh, mm] = timeVal.split(':').map(Number);
+    const slotTime = new Date(); slotTime.setHours(hh, mm, 0, 0);
+    if (slotTime <= now) {
+      alert('Este horário já passou hoje. Escolha um horário futuro.');
+      return;
+    }
+  }
 
   const newTime = formatTimeDisplay(timeVal);
   const d       = parseDate(dateVal);
@@ -662,6 +682,24 @@ async function addSlot() {
   const btn     = event.target;
 
   if (!date || !timeVal) { showMsg(msgEl, 'error', 'Selecione a data e o horário.'); return; }
+
+  // --- Validate date is not in the past ---
+  const selectedDate = parseDate(date);
+  const now          = new Date();
+  const today        = new Date(); today.setHours(0,0,0,0);
+  if (selectedDate < today) {
+    showMsg(msgEl, 'error', 'Não é possível adicionar horários em datas passadas.');
+    return;
+  }
+  // --- If today, check time hasn't passed ---
+  if (selectedDate.getTime() === today.getTime()) {
+    const [hh, mm]  = timeVal.split(':').map(Number);
+    const slotTime  = new Date(); slotTime.setHours(hh, mm, 0, 0);
+    if (slotTime <= now) {
+      showMsg(msgEl, 'error', 'Este horário já passou hoje. Escolha um horário futuro.');
+      return;
+    }
+  }
 
   // --- Format time for display (20:00 → 20h, 20:30 → 20h30) ---
   const time = formatTimeDisplay(timeVal);
