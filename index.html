@@ -163,7 +163,7 @@
 
         <div id="adminLogin">
           <div class="admin-login">
-            <input type="password" id="adminPassword" placeholder="Senha" onkeydown="if(event.key==='Enter'){ if(!document.getElementById('adminPanel').classList.contains('open')) document.getElementById('adminPanel').classList.add('open'); adminAuth(); }"/>
+            <input type="password" id="adminPassword" placeholder="Senha" onkeyup="if(event.key==='Enter'){ if(!document.getElementById('adminPanel').classList.contains('open')) document.getElementById('adminPanel').classList.add('open'); adminAuth(); }"/>
             <button class="btn-small" onclick="adminAuth()">Entrar</button>
           </div>
           <div class="message" id="adminLoginMsg"></div>
