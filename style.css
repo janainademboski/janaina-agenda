@@ -290,6 +290,16 @@ body::before {
   color     : var(--purple);
 }
 
+.header-logo-link {
+  text-decoration: none;
+  color          : inherit;
+  cursor         : pointer;
+}
+
+.header-logo-link em {
+  color: var(--purple);
+}
+
 .divider {
   width     : 40px;
   height    : 1px;
