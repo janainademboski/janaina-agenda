@@ -537,17 +537,39 @@ async function confirmDeleteSlot(id) {
   } catch(e) { alert('Erro de conexão.'); btn.disabled = false; btn.textContent = 'Sim, deletar'; }
 }
 
+function formatTimestamp(ts) {
+  if (!ts) return '—';
+  // --- Handle ISO format (2026-03-26T16:58:25.000Z) ---
+  const iso = String(ts);
+  if (iso.includes('T')) {
+    const d = new Date(iso);
+    if (!isNaN(d)) {
+      return d.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo',
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit' });
+    }
+  }
+  // --- Already formatted (26/03/2026, 16:58) ---
+  return ts;
+}
+
 function renderAdminBookings(bookings) {
   const el = document.getElementById('adminBookingsList');
-  if (!bookings.length) { el.innerHTML = '<p style="font-size:13px;color:var(--muted);font-weight:300;">Nenhum agendamento ainda.</p>'; return; }
-  el.innerHTML = bookings.map(b => `
+  if (!bookings.length) {
+    el.innerHTML = '<p style="font-size:13px;color:var(--muted);font-weight:300;">Nenhum agendamento ainda.</p>';
+    return;
+  }
+  // --- Newest first ---
+  const sorted = [...bookings].reverse();
+  el.innerHTML = sorted.map(b => `
     <div class="booking-row">
       <div class="booking-slot-id">${b.slotId}</div>
       <div class="booking-details">
         <strong>${b.name}</strong><br/>
         📱 ${b.whatsapp}<br/>
         ✉️ ${b.email}<br/>
-        <span style="font-size:11px;color:var(--muted);">${b.timestamp}</span>
+        ${b.message ? `💬 ${b.message}<br/>` : ''}
+        <span style="font-size:11px;color:var(--muted);">${formatTimestamp(b.timestamp)}</span>
       </div>
     </div>`).join('');
 }
