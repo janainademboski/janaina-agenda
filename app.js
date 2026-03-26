@@ -125,16 +125,41 @@ initTheme();
 loadSlots();
 restoreAdminSession();
 populateTimeDropdown();
+initDatePicker();
+
+// --- Set min date on date picker to today ---
+function initDatePicker() {
+  const today  = new Date();
+  const yyyy   = today.getFullYear();
+  const mm     = String(today.getMonth() + 1).padStart(2, '0');
+  const dd     = String(today.getDate()).padStart(2, '0');
+  const minVal = `${yyyy}-${mm}-${dd}`;
+  const picker = document.getElementById('newSlotDate');
+  if (picker) picker.min = minVal;
+}
 
 // --- Load slots ---
 async function loadSlots() {
   try {
     const data = await api({ action: 'getSlots' });
+    const now   = new Date();
     const today = new Date(); today.setHours(0,0,0,0);
     slots = (data.slots || [])
       .filter(s => {
         const d = parseDate(s.date);
-        return d && d >= today; // --- Hide past slots ---
+        if (!d || d < today) return false; // --- Hide past dates ---
+        // --- If today, check if time has passed ---
+        if (d.getTime() === today.getTime()) {
+          const timeParts = s.time.match(/^(\d{1,2})h(\d{0,2})/);
+          if (timeParts) {
+            const slotHour = parseInt(timeParts[1]);
+            const slotMin  = parseInt(timeParts[2] || 0);
+            const slotDate = new Date(d);
+            slotDate.setHours(slotHour, slotMin, 0, 0);
+            if (slotDate <= now) return false; // --- Hide past times today ---
+          }
+        }
+        return true;
       })
       .sort((a, b) => {
         const da = parseDate(a.date), db = parseDate(b.date);
@@ -143,6 +168,10 @@ async function loadSlots() {
         return (a.time || '').localeCompare(b.time || '');
       });
     renderCalendar();
+    // --- Re-render admin slots if already logged in ---
+    if (adminPass && document.getElementById('adminContent').style.display === 'block') {
+      renderAdminSlots();
+    }
   } catch(e) {
     document.getElementById('calendarContainer').innerHTML =
       `<div class="empty-state">Não foi possível carregar os horários. Tente novamente.</div>`;
@@ -393,6 +422,7 @@ function toggleAdmin() {
 
   // --- Fix 2: If session exists and panel just opened, restore UI ---
   if (isOpen && adminPass) {
+    initDatePicker();
     api({ action: 'adminGetBookings', password: adminPass }).then(data => {
       if (data.success) {
         document.getElementById('adminLogin').style.display   = 'none';
