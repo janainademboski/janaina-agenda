@@ -1,5 +1,5 @@
 // --- Config ---
-const API_URL        = 'https://script.google.com/macros/s/AKfycbxHn1PxzGAmcmACd9Wad6OXk6rQYTySr40XFK2ckH2LPXz_chPDAdpyF4eN9BJ9Ifc/exec';
+const API_URL        = 'https://script.google.com/macros/s/AKfycbx_RVF-_Gz1D6aYLd54aVnuVtYea4DMtgqHaZnpOcdBPd_tpAnA33sifXjyFR24cBAR2g/exec';
 const CALLMEBOT_PHONE = '5561992849023';
 const CALLMEBOT_KEY   = 'YOUR_CALLMEBOT_KEY';
 
