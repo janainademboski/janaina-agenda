@@ -12,6 +12,15 @@
   font-display: swap;
 }
 
+/* --- Fallback font sized to match Great Vibes to minimize CLS --- */
+@font-face {
+  font-family     : 'Great Vibes Fallback';
+  src             : local('Georgia'), local('Times New Roman');
+  size-adjust     : 165%;
+  ascent-override : 75%;
+  descent-override: 20%;
+}
+
 @font-face {
   font-family : 'Playfair Display';
   src         : url('fonts/playfair-display-v40-latin-regular.woff2') format('woff2');
@@ -207,6 +216,7 @@ body::before {
   background    : var(--surface);
   color         : var(--muted);
   cursor        : pointer;
+  min-width     : 72px;
   transition    : all 0.2s;
 }
 
@@ -245,6 +255,7 @@ body::before {
 .header {
   text-align   : center;
   margin-bottom: 48px;
+  min-height   : 220px;
   animation    : fadeUp 0.6s ease both;
 }
 
@@ -276,11 +287,12 @@ body::before {
 }
 
 .header h1 {
-  font-family  : 'Great Vibes', cursive;
+  font-family  : 'Great Vibes', 'Great Vibes Fallback', cursive;
   font-size    : clamp(2.8rem, 7vw, 4.2rem);
   font-weight  : 400;
   line-height  : 1.2;
   margin-bottom: 6px;
+  min-height   : 1.2em;
   color        : var(--text);
   transition   : color 0.3s;
 }
