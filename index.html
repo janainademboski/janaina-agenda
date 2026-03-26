@@ -14,8 +14,8 @@
   <!-- Theme switcher bar -->
   <div class="theme-bar" id="themeBar">
     <span class="theme-label">Tema</span>
-    <button class="tbtn active" data-theme="warm" onclick="setTheme('warm', this)">Claro</button>
-    <button class="tbtn"        data-theme="dark" onclick="setTheme('dark', this)">Escuro</button>
+    <button class="tbtn" data-theme="warm" onclick="setTheme('warm', this)">Claro</button>
+    <button class="tbtn" data-theme="dark" onclick="setTheme('dark', this)">Escuro</button>
   </div>
 
   <div class="container">
@@ -23,7 +23,7 @@
     <!-- Header -->
     <div class="header">
       <div class="header-eyebrow">Psicóloga Clínica · CRP 01/31035</div>
-      <h1>Janaína<br/><em>Demboski</em></h1>
+      <img src="logo.png" alt="Janaína Demboski" class="header-logo"/>
       <div class="divider"></div>
       <div class="header-sub">Atendimento online e presencial · Águas Claras &amp; Plano Piloto</div>
     </div>
@@ -96,7 +96,7 @@
 
       <div id="adminLogin">
         <div class="admin-login">
-          <input type="password" id="adminPassword" placeholder="Senha" onkeydown="if(event.key==='Enter') adminAuth()"/>
+          <input type="password" id="adminPassword" placeholder="Senha" onkeydown="if(event.key==='Enter'){ if(!document.getElementById('adminPanel').classList.contains('open')) document.getElementById('adminPanel').classList.add('open'); adminAuth(); }"/>
           <button class="btn-small" onclick="adminAuth()">Entrar</button>
         </div>
         <div class="message" id="adminLoginMsg"></div>

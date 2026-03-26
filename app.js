@@ -32,14 +32,14 @@ function initTheme() {
   const saved = localStorage.getItem('jana-theme');
   let theme;
   if (saved) {
-    // User has manually chosen before — respect their choice
     theme = saved;
   } else {
-    // First visit — use system preference
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     theme = prefersDark ? 'dark' : 'warm';
   }
   document.documentElement.setAttribute('data-theme', theme);
+  // --- Fix 2: Remove active from ALL buttons first, then set correct one ---
+  document.querySelectorAll('.tbtn').forEach(b => b.classList.remove('active'));
   const btn = document.querySelector(`.tbtn[data-theme="${theme}"]`);
   if (btn) btn.classList.add('active');
 }
@@ -47,19 +47,20 @@ function initTheme() {
 // --- Fix 2: Restore admin session on page load ---
 function restoreAdminSession() {
   if (!adminPass) return;
-  // Silently re-auth and restore admin panel if session exists
   api({ action: 'adminGetBookings', password: adminPass }).then(data => {
     if (data.success) {
       document.getElementById('adminLogin').style.display   = 'none';
       document.getElementById('adminContent').style.display = 'block';
-      // Only restore if admin panel is open
-      if (document.getElementById('adminPanel').classList.contains('open')) {
+      // --- Fix 3: Re-open panel if it was open before refresh ---
+      const wasOpen = sessionStorage.getItem('jana-admin-open') === 'true';
+      if (wasOpen) {
+        document.getElementById('adminPanel').classList.add('open');
         renderAdminBookings(data.bookings);
         renderAdminSlots();
       }
     } else {
-      // Session invalid — clear it
       sessionStorage.removeItem('jana-admin-pass');
+      sessionStorage.removeItem('jana-admin-open');
       adminPass = '';
     }
   }).catch(() => {});
@@ -306,9 +307,13 @@ async function submitBooking() {
 function toggleAdmin() {
   const panel = document.getElementById('adminPanel');
   panel.classList.toggle('open');
+  const isOpen = panel.classList.contains('open');
+
+  // --- Fix 3: Save open state ---
+  sessionStorage.setItem('jana-admin-open', isOpen);
 
   // --- Fix 2: If session exists and panel just opened, restore UI ---
-  if (panel.classList.contains('open') && adminPass) {
+  if (isOpen && adminPass) {
     api({ action: 'adminGetBookings', password: adminPass }).then(data => {
       if (data.success) {
         document.getElementById('adminLogin').style.display   = 'none';
@@ -329,6 +334,7 @@ async function adminAuth() {
       // --- Fix 2: Save session so refresh doesn't log out ---
       adminPass = pw;
       sessionStorage.setItem('jana-admin-pass', pw);
+      sessionStorage.setItem('jana-admin-open', 'true');
       document.getElementById('adminLogin').style.display   = 'none';
       document.getElementById('adminContent').style.display = 'block';
       renderAdminBookings(data.bookings);
