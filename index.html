@@ -319,6 +319,25 @@
     .field input:focus { border-color: var(--purple); background: white; }
     .field input::placeholder { color: var(--muted); opacity: 0.6; }
 
+    .field input.invalid {
+      border-color: var(--error);
+      background: rgba(160,90,90,0.04);
+    }
+
+    .field input.valid {
+      border-color: var(--success);
+    }
+
+    .field-error {
+      font-size: 11px;
+      color: var(--error);
+      margin-top: 5px;
+      display: none;
+      font-weight: 400;
+    }
+
+    .field-error.show { display: block; }
+
     .btn-submit {
       width: 100%;
       padding: 14px;
@@ -615,15 +634,18 @@
     <div class="fields-row">
       <div class="field">
         <label>Nome completo</label>
-        <input type="text" id="fieldName" placeholder="Seu nome" autocomplete="name"/>
+        <input type="text" id="fieldName" placeholder="Nome e sobrenome" autocomplete="name" oninput="validateName()"/>
+        <div class="field-error" id="errName">Informe nome e sobrenome.</div>
       </div>
       <div class="field">
         <label>WhatsApp</label>
-        <input type="tel" id="fieldWhatsapp" placeholder="(61) 99999-9999" autocomplete="tel"/>
+        <input type="tel" id="fieldWhatsapp" placeholder="(61) 99999-9999" autocomplete="tel" oninput="validateWhatsapp()"/>
+        <div class="field-error" id="errWhatsapp">Informe um número válido (mínimo 10 dígitos).</div>
       </div>
       <div class="field">
         <label>E-mail</label>
-        <input type="email" id="fieldEmail" placeholder="seu@email.com" autocomplete="email"/>
+        <input type="email" id="fieldEmail" placeholder="seu@email.com" autocomplete="email" oninput="validateEmail()"/>
+        <div class="field-error" id="errEmail">Informe um e-mail válido.</div>
       </div>
     </div>
     <button class="btn-submit" id="btnSubmit" onclick="submitBooking()">Confirmar agendamento</button>
@@ -865,6 +887,42 @@
     }
   }
 
+  // --- Validation helpers ---
+  function validateName() {
+    const input = document.getElementById('fieldName');
+    const err   = document.getElementById('errName');
+    const val   = input.value.trim();
+    // Must have at least two words, each at least 2 chars, letters only (including accents)
+    const valid = /^[A-Za-zÀ-ÖØ-öø-ÿ]{2,}(\s+[A-Za-zÀ-ÖØ-öø-ÿ]{2,})+$/.test(val);
+    input.classList.toggle('invalid', !valid && val.length > 0);
+    input.classList.toggle('valid',    valid);
+    err.classList.toggle('show',      !valid && val.length > 0);
+    return valid;
+  }
+
+  function validateWhatsapp() {
+    const input  = document.getElementById('fieldWhatsapp');
+    const err    = document.getElementById('errWhatsapp');
+    const digits = input.value.replace(/\D/g, '');
+    // Brazil numbers: 10–11 digits
+    const valid  = digits.length >= 10 && digits.length <= 11;
+    input.classList.toggle('invalid', !valid && input.value.length > 0);
+    input.classList.toggle('valid',    valid);
+    err.classList.toggle('show',      !valid && input.value.length > 0);
+    return valid;
+  }
+
+  function validateEmail() {
+    const input = document.getElementById('fieldEmail');
+    const err   = document.getElementById('errEmail');
+    const val   = input.value.trim();
+    const valid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(val);
+    input.classList.toggle('invalid', !valid && val.length > 0);
+    input.classList.toggle('valid',    valid);
+    err.classList.toggle('show',      !valid && val.length > 0);
+    return valid;
+  }
+
   // --- Submit booking ---
   async function submitBooking() {
     const name     = document.getElementById('fieldName').value.trim();
@@ -876,9 +934,15 @@
     msgEl.className = 'message'; msgEl.style.display = 'none';
 
     if (!selectedSlot) { showMsg(msgEl,'error','Selecione um horário.'); return; }
-    if (!name)         { showMsg(msgEl,'error','Informe seu nome.'); return; }
-    if (!whatsapp)     { showMsg(msgEl,'error','Informe seu WhatsApp.'); return; }
-    if (!email)        { showMsg(msgEl,'error','Informe seu e-mail.'); return; }
+
+    // --- Run all validations ---
+    const nameOk  = validateName();
+    const phoneOk = validateWhatsapp();
+    const emailOk = validateEmail();
+
+    if (!nameOk)  { showMsg(msgEl,'error','Informe seu nome completo (nome e sobrenome).'); return; }
+    if (!phoneOk) { showMsg(msgEl,'error','Informe um número de WhatsApp válido.'); return; }
+    if (!emailOk) { showMsg(msgEl,'error','Informe um e-mail válido.'); return; }
 
     btn.disabled = true; btn.textContent = 'Confirmando...';
 
