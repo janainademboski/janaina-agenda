@@ -473,7 +473,7 @@ function renderAdminSlots() {
         <span class="slot-status-pill ${slot.status}">${slot.status === 'available' ? 'Livre' : 'Reservado'}</span>
         <div class="admin-slot-actions">
           <button class="btn-small ${slot.status === 'available' ? 'danger' : 'success-btn'}"
-                  onclick="toggleSlotStatus('${slot.id}','${slot.status}')">
+                  onclick="startToggleSlotStatus('${slot.id}','${slot.status}')">
             ${slot.status === 'available' ? 'Bloquear' : 'Liberar'}
           </button>
           <button class="btn-icon btn-edit" title="Editar" onclick="startEditSlot('${slot.id}')">✏️</button>
@@ -587,7 +587,22 @@ async function saveEditSlot(oldId) {
   } catch(e) { alert('Erro de conexão.'); btn.disabled = false; btn.textContent = '✓ Salvar'; }
 }
 
-// --- Start inline delete confirmation ---
+// --- Start inline block/unblock confirmation ---
+function startToggleSlotStatus(id, currentStatus) {
+  const slot = slots.find(s => s.id === id);
+  if (!slot) return;
+  const d      = parseDate(slot.date);
+  const lbl    = d ? `${d.getDate()} de ${MONTHS[d.getMonth()]} · ${slot.time}` : slot.time;
+  const action = currentStatus === 'available' ? 'Bloquear' : 'Liberar';
+  const cls    = currentStatus === 'available' ? 'danger' : 'success-btn';
+  const row    = document.getElementById(`row-${id}`);
+  row.innerHTML = `
+    <span style="font-size:13px;color:var(--text-2);">${action} <strong>${slot.day} — ${lbl}</strong>?</span>
+    <div class="admin-slot-actions">
+      <button class="btn-small ${cls}" onclick="toggleSlotStatus('${id}','${currentStatus}')">Sim, ${action.toLowerCase()}</button>
+      <button class="btn-small" style="background:var(--muted)" onclick="renderAdminSlots()">Cancelar</button>
+    </div>`;
+}
 function startDeleteSlot(id) {
   const slot = slots.find(s => s.id === id);
   if (!slot) return;
