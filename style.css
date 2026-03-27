@@ -1286,10 +1286,33 @@ body::before {
   border-bottom: 2px solid var(--brand);
 }
 
-margin-top : 20px;
-padding-top: 20px;
-border-top : 1px solid var(--border);
-transition : border-color 0.35s;
+/* --- Scrollable slots list --- */
+.slots-scroll {
+  max-height   : 480px;
+  overflow-y   : auto;
+  padding-right: 4px;
+  margin-bottom: 8px;
+}
+
+.slots-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.slots-scroll::-webkit-scrollbar-track {
+  background   : var(--surface-2);
+  border-radius: 4px;
+}
+
+.slots-scroll::-webkit-scrollbar-thumb {
+  background   : var(--border-strong);
+  border-radius: 4px;
+}
+
+.add-slot-form {
+  margin-top : 28px;
+  padding-top: 20px;
+  border-top : 1px solid var(--border);
+  transition : border-color 0.35s;
 }
 
 .add-slot-form h4 {
