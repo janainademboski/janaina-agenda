@@ -1,5 +1,5 @@
 // --- Config ---
-const API_URL = 'https://script.google.com/macros/s/AKfycbyzux0rLqz8qVSaZ7UaDXcGIWtgpCExDcXx9q3eLmF9CqHnstEn8PJ4-hQmZsTNvj2ZBQ/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbxaoXPOfPSssc2P6ronp-lz5-fIG4E5ivjj8GyjW9-TXK66ISF82iZSdge8BsXROQKc0w/exec';
 
 // --- State ---
 let slots        = [];
@@ -341,6 +341,13 @@ async function confirmCancel() {
         'Seu agendamento foi cancelado com sucesso. Você receberá um e-mail de confirmação em breve.';
       document.getElementById('cancelActions').innerHTML =
         `<a class="btn-new-booking" href="${window.location.pathname}" style="display:inline-block;margin-top:16px;text-decoration:none;">Fazer novo agendamento</a>`;
+    } else if (data.error === 'already_cancelled') {
+      document.getElementById('cancelIcon').textContent  = '⚠️';
+      document.getElementById('cancelTitle').textContent = 'Já cancelado';
+      document.getElementById('cancelMsg').textContent   =
+        'Este agendamento já foi cancelado anteriormente ou o link não é mais válido.';
+      document.getElementById('cancelActions').innerHTML =
+        `<a class="btn-new-booking" href="${window.location.pathname}" style="display:inline-block;margin-top:16px;text-decoration:none;">Voltar à agenda</a>`;
     } else {
       document.getElementById('cancelIcon').textContent  = '⚠️';
       document.getElementById('cancelTitle').textContent = 'Link inválido';
