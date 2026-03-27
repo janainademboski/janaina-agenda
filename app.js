@@ -311,6 +311,10 @@ function selectSlot(id) {
     form.style.display = 'block';
     document.getElementById('selectedSlotInfo').textContent = lbl;
     setTimeout(() => form.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+    // --- Track slot selection in GA4 ---
+    if (typeof gtag !== 'undefined') {
+      gtag('event', 'slot_selected', { slot_id: id });
+    }
   } else {
     form.style.display = 'none';
   }
@@ -339,6 +343,10 @@ async function confirmCancel() {
   try {
     const data = await api({ action: 'cancelBooking', token: window._cancelToken });
     if (data.success) {
+      // --- Track cancellation in GA4 ---
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'booking_cancelled');
+      }
       document.getElementById('cancelIcon').textContent  = '✅';
       document.getElementById('cancelTitle').textContent = 'Agendamento cancelado!';
       document.getElementById('cancelMsg').textContent   =
