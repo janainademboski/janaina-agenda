@@ -333,7 +333,7 @@
 .calendar-grid {
   display              : grid;
   grid-template-columns: repeat(6, 1fr);
-  gap                  : 8px;
+  gap                  : 10px;
   background           : var(--surface);
   border               : 1.5px solid var(--border);
   border-radius        : 16px;
@@ -350,8 +350,8 @@
   flex-direction: column;
   align-items   : center;
   border-radius : 10px;
-  padding       : 10px 6px;
-  min-height    : 100px;
+  padding       : 12px 8px;
+  min-height    : 110px;
 }
 
 .day-cell.has-slots {
@@ -400,8 +400,8 @@
    ============================================================ */
 .slot-btn {
   width        : 100%;
-  margin-bottom: 5px;
-  padding      : 6px 4px;
+  margin-bottom: 8px;
+  padding      : 9px 4px;
   border-radius: 6px;
   border       : 1.5px solid var(--border);
   background   : var(--surface);
