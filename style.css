@@ -1563,7 +1563,7 @@ body {
   min-width      : 13px;
   max-width      : 13px;
   vertical-align : middle;
-  margin-right   : 4px;
+  margin-right   : 0;
   stroke         : currentColor;
   stroke-width   : 2.5;
   stroke-linecap : round;
@@ -1574,9 +1574,10 @@ body {
 
 /* Make btn-small use flex for icon alignment */
 .btn-small {
-  display    : inline-flex;
-  align-items: center;
+  display        : inline-flex;
+  align-items    : center;
   justify-content: center;
+  gap            : 5px;
 }
 
 }
