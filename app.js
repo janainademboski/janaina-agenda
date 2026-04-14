@@ -5,22 +5,22 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbx7IAq3iUs6y6FjjurXGKCc
 let slots        = [];
 let selectedSlot = null;
 let adminPass    = sessionStorage.getItem('jana-admin-pass') || ''; // Fix 2: persist session
-
+ 
 // --- Portuguese labels ---
 const MONTHS       = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 const MONTHS_SHORT = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 const DAYS_FULL    = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
 const DAY_SHORT    = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-
+ 
 // --- API helper: all requests via GET params to avoid CORS ---
 async function api(params) {
   const url = API_URL + '?' + new URLSearchParams(params).toString();
   const res  = await fetch(url, { redirect: 'follow' });
   return res.json();
 }
-
+ 
 // --- Theme ---
-
+ 
 // --- Fix 2: Restore admin session on page load ---
 function restoreAdminSession() {
   if (!adminPass) return;
@@ -42,7 +42,7 @@ function restoreAdminSession() {
     }
   }).catch(() => {});
 }
-
+ 
 // --- Populate time dropdown with 15min intervals ---
 function populateTimeDropdown() {
   const select = document.getElementById('newSlotTime');
@@ -57,7 +57,7 @@ function populateTimeDropdown() {
     }
   }
 }
-
+ 
 // --- Auto-fill Day and ID when date changes ---
 function onSlotDateChange() {
   const dateVal = document.getElementById('newSlotDate').value;
@@ -71,10 +71,10 @@ function onSlotDateChange() {
   document.getElementById('newSlotDay').value = dayName;
   updateSlotId();
 }
-
+ 
 // --- Auto-fill ID when time changes ---
 function onSlotTimeChange() { updateSlotId(); }
-
+ 
 // --- Generate unique ID from date + time ---
 function updateSlotId() {
   const dateVal = document.getElementById('newSlotDate').value;
@@ -86,7 +86,7 @@ function updateSlotId() {
   const timeClean = timeVal.replace(':', 'h').replace('h00', 'h');
   document.getElementById('newSlotId').value = `${dateVal}-${timeClean}`;
 }
-
+ 
 // --- Format time value for display (e.g. "20:00" → "20h") ---
 function formatTimeDisplay(timeVal) {
   if (!timeVal) return '';
@@ -99,7 +99,7 @@ loadSlots();
 restoreAdminSession();
 populateTimeDropdown();
 initDatePicker();
-
+ 
 // --- Set min date on date picker to today ---
 function initDatePicker() {
   const today  = new Date();
@@ -110,7 +110,7 @@ function initDatePicker() {
   const picker = document.getElementById('newSlotDate');
   if (picker) picker.min = minVal;
 }
-
+ 
 // --- Load slots ---
 async function loadSlots() {
   try {
@@ -152,7 +152,7 @@ async function loadSlots() {
       `<div class="empty-state">Não foi possível carregar os horários. Tente novamente.</div>`;
   }
 }
-
+ 
 // --- Parse date safely as local (avoids UTC timezone shift) ---
 function parseDate(str) {
   if (!str) return null;
@@ -162,7 +162,7 @@ function parseDate(str) {
   const d = new Date(s);
   return isNaN(d) ? null : d;
 }
-
+ 
 // --- Get Monday of week ---
 function getMonday(d) {
   const date = new Date(d);
@@ -171,7 +171,7 @@ function getMonday(d) {
   date.setDate(date.getDate() + diff);
   return date;
 }
-
+ 
 // --- Format week label ---
 function formatWeekLabel(monday) {
   const sat = new Date(monday);
@@ -182,7 +182,7 @@ function formatWeekLabel(monday) {
     return `${d1} – ${d2} de ${MONTHS[m1]} de ${y1}`;
   return `${d1} ${MONTHS_SHORT[m1]} – ${d2} ${MONTHS_SHORT[m2]} ${sat.getFullYear()}`;
 }
-
+ 
 // --- Render calendar ---
 function renderCalendar() {
   const container = document.getElementById('calendarContainer');
@@ -190,7 +190,7 @@ function renderCalendar() {
     container.innerHTML = `<div class="empty-state">Nenhum horário disponível no momento.</div>`;
     return;
   }
-
+ 
   // --- Group slots by week ---
   const weekMap = new Map();
   slots.forEach(slot => {
@@ -201,28 +201,28 @@ function renderCalendar() {
     if (!weekMap.has(key)) weekMap.set(key, { monday: mon, slots: [] });
     weekMap.get(key).slots.push({ ...slot, parsedDate: d });
   });
-
+ 
   if (!weekMap.size) {
     container.innerHTML = `<div class="empty-state">Adicione datas aos horários na planilha (coluna E, formato YYYY-MM-DD).</div>`;
     return;
   }
-
+ 
   const COL_DAYS = [1, 2, 3, 4, 5, 6]; // Mon–Sat
   let html = '';
-
+ 
   weekMap.forEach(({ monday, slots: wSlots }) => {
     html += `<div class="week-block"><div class="week-header">Semana de ${formatWeekLabel(monday)}</div><div class="calendar-grid">`;
-
+ 
     COL_DAYS.forEach(dow => {
       const cellDate = new Date(monday);
       cellDate.setDate(monday.getDate() + (dow - 1));
-
+ 
       const daySlots = wSlots.filter(s =>
         s.parsedDate.getFullYear() === cellDate.getFullYear() &&
         s.parsedDate.getMonth()    === cellDate.getMonth()    &&
         s.parsedDate.getDate()     === cellDate.getDate()
       );
-
+ 
       const dayLabel = DAY_SHORT[dow];
       const dateNum  = cellDate.getDate();
       const monthStr = MONTHS_SHORT[cellDate.getMonth()];
@@ -233,7 +233,7 @@ function renderCalendar() {
             <div class="day-date-num">${dateNum}</div>
             <div class="day-month">${monthStr}</div>
           </div>`;
-
+ 
         daySlots.forEach(slot => {
           const isBooked   = slot.status === 'booked';
           const isSelected = selectedSlot && selectedSlot.id === slot.id;
@@ -250,7 +250,7 @@ function renderCalendar() {
             <span class="slot-status-label" aria-hidden="true">${statusTxt}</span>
           </button>`;
         });
-
+ 
         html += `</div>`;
       } else {
         html += `<div class="day-cell empty">
@@ -262,18 +262,18 @@ function renderCalendar() {
         </div>`;
       }
     });
-
+ 
     html += `</div></div>`;
   });
-
+ 
   container.innerHTML = html;
 }
-
+ 
 // --- Select slot ---
 function selectSlot(id) {
   selectedSlot = slots.find(s => s.id === id) || null;
   renderCalendar();
-
+ 
   const form = document.getElementById('bookingForm');
   if (selectedSlot) {
     const d   = parseDate(selectedSlot.date);
@@ -291,27 +291,27 @@ function selectSlot(id) {
     form.style.display = 'none';
   }
 }
-
+ 
 // --- Check for cancel token on page load ---
 function checkCancelToken() {
   const params      = new URLSearchParams(window.location.search);
   const cancelToken = params.get('cancel');
   if (!cancelToken) return;
-
+ 
   // --- Show cancel screen, hide everything else ---
   document.getElementById('calendarContainer').style.display = 'none';
   document.getElementById('cancelScreen').style.display      = 'block';
-
+ 
   // --- Store token for confirmation ---
   window._cancelToken = cancelToken;
 }
-
+ 
 // --- Confirm cancellation ---
 async function confirmCancel() {
   const btn = document.getElementById('btnConfirmCancel');
   btn.disabled    = true;
   btn.textContent = 'Cancelando...';
-
+ 
   try {
     const data = await api({ action: 'cancelBooking', token: window._cancelToken });
     if (data.success) {
@@ -352,7 +352,7 @@ function resetBooking() {
   selectedSlot = null;
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-
+ 
 // --- Validation ---
 function validateName() {
   const input = document.getElementById('fieldName');
@@ -364,7 +364,7 @@ function validateName() {
   err.classList.toggle('show',      !valid && val.length > 0);
   return valid;
 }
-
+ 
 function validateWhatsapp() {
   const input  = document.getElementById('fieldWhatsapp');
   const err    = document.getElementById('errWhatsapp');
@@ -375,7 +375,7 @@ function validateWhatsapp() {
   err.classList.toggle('show',      !valid && input.value.length > 0);
   return valid;
 }
-
+ 
 function validateEmail() {
   const input = document.getElementById('fieldEmail');
   const err   = document.getElementById('errEmail');
@@ -386,7 +386,7 @@ function validateEmail() {
   err.classList.toggle('show',      !valid && val.length > 0);
   return valid;
 }
-
+ 
 // --- Validate tipo de atendimento ---
 function validateTipo() {
   const selected = document.querySelector('input[name="tipoAtendimento"]:checked');
@@ -407,30 +407,30 @@ async function submitBooking() {
   const tipo     = tipoEl ? tipoEl.value : '';
   const msgEl    = document.getElementById('formMessage');
   const btn      = document.getElementById('btnSubmit');
-
+ 
   msgEl.className = 'message'; msgEl.style.display = 'none';
-
+ 
   if (!selectedSlot) { showMsg(msgEl, 'error', 'Selecione um horário.'); return; }
-
+ 
   const tipoOk  = validateTipo();
   const nameOk  = validateName();
   const phoneOk = validateWhatsapp();
   const emailOk = validateEmail();
-
+ 
   if (!tipoOk)  { showMsg(msgEl, 'error', 'Selecione o tipo de atendimento.'); return; }
   if (!nameOk)  { showMsg(msgEl, 'error', 'Informe seu nome completo (nome e sobrenome).'); return; }
   if (!phoneOk) { showMsg(msgEl, 'error', 'Informe um número de WhatsApp válido.'); return; }
   if (!emailOk) { showMsg(msgEl, 'error', 'Informe um e-mail válido.'); return; }
-
+ 
   btn.disabled = true; btn.textContent = 'Confirmando...';
-
+ 
   try {
     const data = await api({
       action: 'bookSlot',
       slotId: selectedSlot.id,
       name, whatsapp, email, message, tipo
     });
-
+ 
     if (data.success) {
       // --- Reset form fields ---
       document.getElementById('fieldName').value     = '';
@@ -444,7 +444,7 @@ async function submitBooking() {
       document.getElementById('fieldEmail').classList.remove('valid', 'invalid');
       document.getElementById('formMessage').style.display = 'none';
       btn.disabled = false; btn.textContent = 'Confirmar agendamento';
-
+ 
       document.getElementById('bookingForm').style.display   = 'none';
       document.getElementById('successScreen').style.display = 'block';
       document.getElementById('successScreen').scrollIntoView({ behavior: 'smooth' });
@@ -470,14 +470,14 @@ async function submitBooking() {
     btn.disabled = false; btn.textContent = 'Confirmar agendamento';
   }
 }
-
+ 
 // --- Switch admin tabs ---
 function switchTab(tab) {
   const horarios      = document.getElementById('tabContentHorarios');
   const agendamentos  = document.getElementById('tabContentAgendamentos');
   const tabHorarios   = document.getElementById('tabHorarios');
   const tabAgend      = document.getElementById('tabAgendamentos');
-
+ 
   if (tab === 'horarios') {
     horarios.style.display     = 'block';
     agendamentos.style.display = 'none';
@@ -490,20 +490,20 @@ function switchTab(tab) {
     tabAgend.classList.add('active');
   }
 }
-
+ 
 // --- Admin ---
 function toggleAdmin() {
   const panel  = document.getElementById('adminPanel');
   const btn    = document.querySelector('.btn-admin');
   panel.classList.toggle('open');
   const isOpen = panel.classList.contains('open');
-
+ 
   // --- Update aria-expanded ---
   if (btn) btn.setAttribute('aria-expanded', isOpen);
-
+ 
   // --- Fix 3: Save open state ---
   sessionStorage.setItem('jana-admin-open', isOpen);
-
+ 
   // --- Fix 2: If session exists and panel just opened, restore UI ---
   if (isOpen && adminPass) {
     initDatePicker();
@@ -517,7 +517,7 @@ function toggleAdmin() {
     }).catch(() => {});
   }
 }
-
+ 
 async function adminAuth() {
   const pw    = document.getElementById('adminPassword').value;
   const msgEl = document.getElementById('adminLoginMsg');
@@ -535,7 +535,7 @@ async function adminAuth() {
     } else { showMsg(msgEl, 'error', 'Senha incorreta.'); }
   } catch(e) { showMsg(msgEl, 'error', 'Erro de conexão.'); }
 }
-
+ 
 function renderAdminSlots() {
   const el = document.getElementById('adminSlotsList');
   if (!slots.length) { el.innerHTML = '<p style="font-size:13px;color:var(--muted);">Nenhum horário cadastrado.</p>'; return; }
@@ -553,13 +553,13 @@ function renderAdminSlots() {
                   onclick="startToggleSlotStatus('${slot.id}','${slot.status}')">
             ${slot.status === 'available' ? 'Bloquear' : 'Liberar'}
           </button>
-          <button class="btn-icon btn-edit" title="Editar" onclick="startEditSlot('${slot.id}')">✏️</button>
-          <button class="btn-icon btn-delete" title="Deletar" onclick="startDeleteSlot('${slot.id}')">🗑️</button>
+          <button class="btn-icon btn-edit" title="Editar" onclick="startEditSlot('${slot.id}')"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+          <button class="btn-icon btn-delete" title="Deletar" onclick="startDeleteSlot('${slot.id}')"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
         </div>
       </div>`;
   }).join('');
 }
-
+ 
 // --- Generate time options with current selected ---
 function getTimeOptions(selectedVal) {
   let html = '<option value="">Selecione...</option>';
@@ -575,27 +575,27 @@ function getTimeOptions(selectedVal) {
   }
   return html;
 }
-
+ 
 // --- Start inline edit ---
 function startEditSlot(id) {
   const slot = slots.find(s => s.id === id);
   if (!slot) return;
-
+ 
   // --- Ensure date is clean YYYY-MM-DD format ---
   const d       = parseDate(slot.date);
   const dateVal = d
     ? `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
     : '';
-
+ 
   // --- Convert display time back to HH:MM for select ---
   let timeVal = slot.time.replace('h', ':');
   if (!timeVal.includes(':')) timeVal += ':00';
   if (timeVal.split(':')[0].length === 1) timeVal = '0' + timeVal;
   if (timeVal.split(':')[1] === undefined || timeVal.split(':')[1] === '') timeVal += '00';
-
+ 
   const today  = new Date();
   const minVal = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-
+ 
   const row = document.getElementById(`row-${id}`);
   row.innerHTML = `
     <div class="admin-edit-row">
@@ -609,7 +609,7 @@ function startEditSlot(id) {
       </div>
     </div>`;
 }
-
+ 
 // --- Auto-update day and ID when edit date/time changes ---
 function onEditDateChange(id) {
   const dateVal = document.getElementById(`edit-date-${id}`).value;
@@ -623,13 +623,13 @@ function onEditDateChange(id) {
     document.getElementById(`edit-id-${id}`).value = `${dateVal}-${formatTimeDisplay(timeVal)}`;
   }
 }
-
+ 
 // --- Save inline edit ---
 async function saveEditSlot(oldId) {
   const dateVal = document.getElementById(`edit-date-${oldId}`).value;
   const timeVal = document.getElementById(`edit-time-${oldId}`).value;
   if (!dateVal || !timeVal) { alert('Selecione data e horário.'); return; }
-
+ 
   // --- Validate date is not in the past ---
   const selectedDate = parseDate(dateVal);
   const now          = new Date();
@@ -647,15 +647,15 @@ async function saveEditSlot(oldId) {
       return;
     }
   }
-
+ 
   const newTime = formatTimeDisplay(timeVal);
   const d       = parseDate(dateVal);
   const newDay  = DAYS_FULL[d.getDay()].split('-')[0];
   const newId   = `${dateVal}-${newTime}`;
-
+ 
   const btn = event.target;
   btn.disabled = true; btn.textContent = 'Salvando...';
-
+ 
   try {
     const data = await api({
       action: 'adminEditSlot', password: adminPass,
@@ -669,7 +669,7 @@ async function saveEditSlot(oldId) {
     } else { alert(data.error || 'Erro ao editar.'); btn.disabled = false; btn.textContent = '✓ Salvar'; }
   } catch(e) { alert('Erro de conexão.'); btn.disabled = false; btn.textContent = '✓ Salvar'; }
 }
-
+ 
 // --- Start inline block/unblock confirmation ---
 function startToggleSlotStatus(id, currentStatus) {
   const slot = slots.find(s => s.id === id);
@@ -699,7 +699,7 @@ function startDeleteSlot(id) {
       <button class="btn-small" style="background:var(--muted)" onclick="renderAdminSlots()">Cancelar</button>
     </div>`;
 }
-
+ 
 // --- Confirm and execute delete ---
 async function confirmDeleteSlot(id) {
   const btn = event.target;
@@ -713,7 +713,7 @@ async function confirmDeleteSlot(id) {
     } else { alert(data.error || 'Erro ao deletar.'); btn.disabled = false; btn.textContent = 'Sim, deletar'; }
   } catch(e) { alert('Erro de conexão.'); btn.disabled = false; btn.textContent = 'Sim, deletar'; }
 }
-
+ 
 function formatTimestamp(ts) {
   if (!ts) return '—';
   const s = String(ts).trim();
@@ -734,7 +734,7 @@ function formatTimestamp(ts) {
   // --- Already formatted (26/03/2026, 14:08) --- return as-is
   return s;
 }
-
+ 
 function renderAdminBookings(bookings) {
   const el = document.getElementById('adminBookingsList');
   // --- Update tab badge count ---
@@ -768,13 +768,13 @@ function renderAdminBookings(bookings) {
     </div>`;
   }).join('');
 }
-
+ 
 async function toggleSlotStatus(id, currentStatus) {
   // --- Fix 3: Prevent double-click ---
   const btn = event.target;
   btn.disabled    = true;
   btn.textContent = 'Processando...';
-
+ 
   const newStatus = currentStatus === 'available' ? 'booked' : 'available';
   try {
     const data = await api({ action: 'adminUpdateSlot', password: adminPass, slotId: id, status: newStatus });
@@ -793,7 +793,7 @@ async function toggleSlotStatus(id, currentStatus) {
     btn.textContent = currentStatus === 'available' ? 'Bloquear' : 'Liberar';
   }
 }
-
+ 
 async function addSlot() {
   const date    = document.getElementById('newSlotDate').value.trim();
   const timeVal = document.getElementById('newSlotTime').value.trim();
@@ -801,9 +801,9 @@ async function addSlot() {
   const id      = document.getElementById('newSlotId').value.trim();
   const msgEl   = document.getElementById('addSlotMsg');
   const btn     = event.target;
-
+ 
   if (!date || !timeVal) { showMsg(msgEl, 'error', 'Selecione a data e o horário.'); return; }
-
+ 
   // --- Validate date is not in the past ---
   const selectedDate = parseDate(date);
   const now          = new Date();

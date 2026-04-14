@@ -1000,6 +1000,8 @@
 }
 
 .admin-login input {
+  background   : var(--surface);
+  border       : 1.5px solid var(--border-strong);
   flex         : 1;
   padding      : 10px 14px;
   border       : 1.5px solid var(--border);
@@ -1075,12 +1077,29 @@
   border       : none;
   cursor       : pointer;
   font-size    : 14px;
-  padding      : 4px 6px;
+  padding      : 5px 7px;
   border-radius: 6px;
   opacity      : 0;
   transition   : opacity 0.2s, background 0.2s;
   line-height  : 1;
+  display      : inline-flex;
+  align-items  : center;
+  justify-content: center;
 }
+
+.btn-icon svg {
+  width : 15px;
+  height: 15px;
+  stroke: var(--muted);
+  fill  : none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke 0.2s;
+}
+
+.btn-edit:hover svg { stroke: var(--brand); }
+.btn-delete:hover svg { stroke: var(--error); }
 
 .admin-slot-row:hover .btn-icon {
   opacity: 1;
@@ -1093,7 +1112,7 @@
 }
 
 .btn-edit:hover {
-  background: rgba(124, 107, 158, 0.12);
+  background: rgba(160, 106, 90, 0.12);
 }
 
 .btn-delete:hover {
@@ -1118,14 +1137,15 @@
 .admin-edit-row input,
 .admin-edit-row select {
   padding      : 7px 10px;
-  border       : 1.5px solid var(--border);
+  border       : 1.5px solid var(--border-strong);
   border-radius: 8px;
   font-family  : 'Inter', sans-serif;
   font-size    : 12px;
   color        : var(--text);
-  background   : var(--surface-2);
+  background   : var(--surface);
   outline      : none;
   width        : 100%;
+  box-sizing   : border-box;
   transition   : border-color 0.2s, background 0.35s, color 0.3s;
 }
 
@@ -1254,15 +1274,16 @@
 .add-slot-inputs input,
 .add-slot-inputs select {
   padding      : 9px 12px;
-  border       : 1.5px solid var(--border);
+  border       : 1.5px solid var(--border-strong);
   border-radius: 8px;
   font-family  : 'Inter', sans-serif;
   font-size    : 12px;
   color        : var(--text);
-  background   : var(--surface-2);
+  background   : var(--surface);
   outline      : none;
   transition   : border-color 0.2s, background 0.35s, color 0.3s;
   width        : 100%;
+  box-sizing   : border-box;
 }
 
 .add-slot-inputs input:focus,
