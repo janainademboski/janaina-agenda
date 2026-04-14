@@ -94,7 +94,7 @@
   --brand-subtle : #f7efed;
   --purple       : #A8B5A2;
   --success      : #4a7a5a;
-  --error        : #a05a5a;
+  --error        : #c0392b;
   --shadow-sm    : 0 1px 3px rgba(160, 106, 90, 0.08), 0 0 0 1px rgba(160, 106, 90, 0.04);
   --shadow-md    : 0 4px 16px rgba(160, 106, 90, 0.10), 0 1px 4px rgba(160, 106, 90, 0.06);
   --shadow-lg    : 0 12px 40px rgba(160, 106, 90, 0.12), 0 2px 8px rgba(160, 106, 90, 0.06);
@@ -527,8 +527,8 @@
 .fields-row {
   display              : grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap                  : 12px;
-  margin-bottom        : 16px;
+  gap                  : 16px;
+  margin-bottom        : 20px;
 }
 
 .field label {
@@ -545,13 +545,13 @@
 .field input {
   width        : 100%;
   padding      : 11px 14px;
-  border       : 1.5px solid var(--border);
+  border       : 1.5px solid var(--border-strong);
   border-radius: 8px;
   font-family  : 'Inter', sans-serif;
   font-size    : 14px;
   font-weight  : 300;
   color        : var(--text);
-  background   : var(--surface-2);
+  background   : var(--surface);
   outline      : none;
   transition   : border-color 0.2s, background 0.35s, color 0.3s;
 }
@@ -590,7 +590,7 @@
   border-radius: 10px;
   cursor       : pointer;
   transition   : all 0.2s;
-  background   : var(--surface-2);
+  background   : var(--surface);
   flex         : 1;
   min-width    : 140px;
 }
@@ -607,7 +607,7 @@
 .radio-option:has(input:checked) {
   border-color: var(--brand);
   background  : var(--brand-subtle);
-  box-shadow  : 0 0 0 3px rgba(107, 90, 158, 0.15);
+  box-shadow  : 0 0 0 3px rgba(160, 106, 90, 0.2);
 }
 
 
@@ -672,7 +672,7 @@
   font-size    : 14px;
   font-weight  : 300;
   color        : var(--text);
-  background   : var(--surface-2);
+  background   : var(--surface);
   outline      : none;
   resize       : none;
   min-height   : 80px;
@@ -692,7 +692,7 @@
 
 .field input.invalid {
   border-color: var(--error);
-  background  : rgba(160, 90, 90, 0.05);
+  background  : rgba(192, 57, 43, 0.05);
 }
 
 .field input.valid {
@@ -764,10 +764,12 @@
 }
 
 .message.error {
-  background: rgba(160, 90, 90, 0.1);
-  border    : 1px solid rgba(160, 90, 90, 0.2);
-  color     : var(--error);
-  display   : block;
+  background: rgba(192, 57, 43, 0.08);
+  border    : 1.5px solid rgba(192, 57, 43, 0.3);
+  border-radius: 8px;
+  padding   : 10px 14px;
+  color     : #c0392b;
+  font-size : 13px;
 }
 
 /* ============================================================
