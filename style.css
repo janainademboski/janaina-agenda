@@ -161,7 +161,7 @@
 
 .header h1 em {
   font-style: normal;
-  color     : var(--purple);
+  color     : var(--brand);
 }
 
 .header-logo-link,
@@ -181,7 +181,7 @@
 .header-logo-link:visited em,
 .header-logo-link:hover em,
 .header-logo-link:active em {
-  color: var(--purple);
+  color: var(--brand);
 }
 
 .divider {
@@ -199,6 +199,24 @@
   letter-spacing: 0.04em;
   transition    : color 0.3s;
 }
+
+
+/* ============================================================
+   BACK LINK — return to about site
+   ============================================================ */
+.back-link {
+  display      : inline-block;
+  font-size    : 11px;
+  font-weight  : 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color        : var(--muted);
+  text-decoration: none;
+  margin-bottom: 1rem;
+  transition   : color 0.25s;
+}
+
+.back-link:hover { color: var(--brand); }
 
 /* ============================================================
    SECTION LABEL
@@ -405,7 +423,7 @@
 }
 
 .slot-btn.selected {
-  border-color: var(--purple);
+  border-color: var(--brand);
   border-width: 2px;
   background  : var(--brand-subtle);
   box-shadow  : 0 0 0 3px rgba(107, 90, 158, 0.25);
@@ -430,7 +448,7 @@
 }
 
 .slot-btn.selected .slot-time-label {
-  color: var(--purple);
+  color: var(--brand);
 }
 
 .slot-btn.booked .slot-time-label {
@@ -452,7 +470,7 @@
 }
 
 .slot-btn.selected .slot-status-label {
-  color: var(--purple);
+  color: var(--brand);
 }
 
 .slot-btn.booked .slot-status-label {
@@ -500,7 +518,7 @@
   border-radius: 8px;
   padding      : 10px 14px;
   font-size    : 13px;
-  color        : var(--purple);
+  color        : var(--brand);
   font-weight  : 500;
   margin-bottom: 20px;
   transition   : background 0.35s, color 0.3s;
@@ -539,7 +557,7 @@
 }
 
 .field input:focus {
-  border-color: var(--purple);
+  border-color: var(--brand);
   background  : var(--surface);
 }
 
@@ -587,7 +605,7 @@
 }
 
 .radio-option:has(input:checked) {
-  border-color: var(--purple);
+  border-color: var(--brand);
   background  : var(--brand-subtle);
   box-shadow  : 0 0 0 3px rgba(107, 90, 158, 0.15);
 }
@@ -606,7 +624,7 @@
 }
 
 .radio-option:has(input:checked) .radio-label {
-  color      : var(--purple);
+  color      : var(--brand);
   font-weight: 500;
 }
 
@@ -663,7 +681,7 @@
 }
 
 .field-full textarea:focus {
-  border-color: var(--purple);
+  border-color: var(--brand);
   background  : var(--surface);
 }
 
