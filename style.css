@@ -619,11 +619,12 @@
 
 
 .radio-icon {
-  font-size   : 16px;
-  display     : flex;
+  display     : inline-flex;
   align-items : center;
   justify-content: center;
   flex-shrink : 0;
+  width       : 18px;
+  height      : 18px;
 }
 
 .radio-label {
@@ -632,8 +633,21 @@
   color      : var(--text-2);
   transition : color 0.3s;
   line-height: 1;
-  display    : flex;
-  align-items: center;
+}
+
+.radio-icon svg {
+  width : 16px;
+  height: 16px;
+  stroke: var(--muted);
+  fill  : none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  display: block;
+}
+
+.radio-option:has(input:checked) .radio-icon svg {
+  stroke: var(--brand);
 }
 
 .radio-option:has(input:checked) .radio-label {
@@ -1026,7 +1040,7 @@
 }
 
 .btn-small {
-  padding       : 9px 16px;
+  padding       : 8px 16px;
   background    : var(--brand);
   color         : #fff;
   border        : none;
@@ -1038,6 +1052,9 @@
   cursor        : pointer;
   transition    : background 0.2s;
   white-space   : nowrap;
+  min-width     : 90px;
+  text-align    : center;
+  flex-shrink   : 0;
 }
 
 .btn-small:hover {
@@ -1056,12 +1073,12 @@
   display        : flex;
   align-items    : center;
   justify-content: space-between;
-  padding        : 10px 0;
+  padding        : 12px 0;
   border-bottom  : 1px solid var(--surface-2);
   font-size      : 13px;
   color          : var(--text-2);
-  gap            : 8px;
-  flex-wrap      : wrap;
+  gap            : 12px;
+  flex-wrap      : nowrap;
   transition     : border-color 0.35s, color 0.3s;
 }
 
@@ -1076,7 +1093,8 @@
 .admin-slot-actions {
   display    : flex;
   align-items: center;
-  gap        : 6px;
+  gap        : 8px;
+  flex-shrink: 0;
 }
 
 .btn-icon {
@@ -1170,9 +1188,13 @@
 .slot-status-pill {
   font-size     : 11px;
   font-weight   : 500;
-  padding       : 3px 10px;
+  padding       : 4px 10px;
   border-radius : 20px;
   letter-spacing: 0.06em;
+  min-width     : 80px;
+  text-align    : center;
+  flex-shrink   : 0;
+  display       : inline-block;
 }
 
 .slot-status-pill.available {
@@ -1205,6 +1227,20 @@
   cursor       : pointer;
   transition   : all 0.2s;
   margin-bottom: -1.5px;
+  display     : inline-flex;
+  align-items : center;
+  gap         : 6px;
+}
+
+.admin-tab svg {
+  width : 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill  : none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
 }
 
 .admin-tab:hover {
@@ -1454,4 +1490,40 @@
   .calendar-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+/* ============================================================
+   INLINE SVG ICONS — booking details + button icons
+   ============================================================ */
+.detail-icon {
+  width          : 13px;
+  height         : 13px;
+  vertical-align : middle;
+  margin-right   : 4px;
+  stroke         : var(--muted);
+  stroke-width   : 1.8;
+  stroke-linecap : round;
+  stroke-linejoin: round;
+  fill           : none;
+  flex-shrink    : 0;
+}
+
+.btn-icon-svg {
+  width          : 13px;
+  height         : 13px;
+  vertical-align : middle;
+  margin-right   : 4px;
+  stroke         : currentColor;
+  stroke-width   : 2.5;
+  stroke-linecap : round;
+  stroke-linejoin: round;
+  fill           : none;
+  flex-shrink    : 0;
+}
+
+/* Make btn-small use flex for icon alignment */
+.btn-small {
+  display    : inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 }
