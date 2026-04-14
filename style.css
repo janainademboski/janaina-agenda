@@ -1105,6 +1105,21 @@ body {
   border-bottom: none;
 }
 
+.admin-month-group {
+  margin-bottom: 1.5rem;
+}
+
+.admin-month-label {
+  font-size     : 10px;
+  font-weight   : 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color         : var(--brand);
+  padding-bottom: 6px;
+  border-bottom : 2px solid var(--brand-subtle);
+  margin-bottom : 4px;
+}
+
 .admin-slot-label {
   flex: 1;
 }

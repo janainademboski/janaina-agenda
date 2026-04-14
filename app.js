@@ -539,7 +539,17 @@ async function adminAuth() {
 function renderAdminSlots() {
   const el = document.getElementById('adminSlotsList');
   if (!slots.length) { el.innerHTML = '<p style="font-size:13px;color:var(--muted);">Nenhum horário cadastrado.</p>'; return; }
-  el.innerHTML = slots.map(slot => {
+ 
+  // --- Group slots by Month-Year ---
+  const groups = {};
+  slots.forEach(slot => {
+    const d = parseDate(slot.date);
+    const key = d ? `${MONTHS[d.getMonth()]} — ${d.getFullYear()}` : 'Outros';
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(slot);
+  });
+ 
+  function slotRow(slot) {
     const d   = parseDate(slot.date);
     const lbl = d
       ? `${d.getDate()} de ${MONTHS[d.getMonth()]} de ${d.getFullYear()} · ${slot.time}`
@@ -559,7 +569,14 @@ function renderAdminSlots() {
             : '<button class="btn-icon btn-delete" title="Deletar" onclick="startDeleteSlot(\'\'+slot.id+\'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>'}
         </div>
       </div>`;
-  }).join('');
+  }
+ 
+  el.innerHTML = Object.entries(groups).map(([monthYear, monthSlots]) => `
+    <div class="admin-month-group">
+      <p class="admin-month-label">${monthYear}</p>
+      ${monthSlots.map(slotRow).join('')}
+    </div>
+  `).join('');
 }
  
 // --- Generate time options with current selected ---
