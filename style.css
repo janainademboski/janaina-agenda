@@ -80,137 +80,30 @@
 /* ============================================================
    TOKENS: WARM (default)
    ============================================================ */
-:root,
-[data-theme="warm"] {
-  --bg           : #faf7f2;
-  --surface      : #fdfaf7;
-  --surface-2    : #f2ede6;
-  --border       : #e0d4c8;
-  --border-strong: #b8a898;
-  --text         : #1a1410;
-  --text-2       : #2e2418;
-  --muted        : #5c4a3a;
-  --brand        : #8b6f5e;
-  --brand-dark   : #6b5044;
-  --brand-subtle : #f5eae4;
-  --purple       : #6b5a9e;
+:root {
+  --bg           : #faf5f3;
+  --surface      : #ffffff;
+  --surface-2    : #F2E6E2;
+  --border       : #e4d0ca;
+  --border-strong: #c4a098;
+  --text         : #3D2B24;
+  --text-2       : #6b4c42;
+  --muted        : #a07d73;
+  --brand        : #A06A5A;
+  --brand-dark   : #855447;
+  --brand-subtle : #f7efed;
+  --purple       : #A8B5A2;
   --success      : #4a7a5a;
   --error        : #a05a5a;
-  --shadow-sm    : 0 1px 3px rgba(100, 60, 30, 0.08), 0 0 0 1px rgba(100, 60, 30, 0.04);
-  --shadow-md    : 0 4px 16px rgba(100, 60, 30, 0.10), 0 1px 4px rgba(100, 60, 30, 0.06);
-  --shadow-lg    : 0 12px 40px rgba(100, 60, 30, 0.12), 0 2px 8px rgba(100, 60, 30, 0.06);
+  --shadow-sm    : 0 1px 3px rgba(160, 106, 90, 0.08), 0 0 0 1px rgba(160, 106, 90, 0.04);
+  --shadow-md    : 0 4px 16px rgba(160, 106, 90, 0.10), 0 1px 4px rgba(160, 106, 90, 0.06);
+  --shadow-lg    : 0 12px 40px rgba(160, 106, 90, 0.12), 0 2px 8px rgba(160, 106, 90, 0.06);
   --glow         : none;
-}
-
-/* ============================================================
-   TOKENS: DARK
-   ============================================================ */
-[data-theme="dark"] {
-  --bg           : #0f1117;
-  --surface      : #1a2035;
-  --surface-2    : #212840;
-  --border       : #2e3850;
-  --border-strong: #3a4a68;
-  --text         : #edf0f8;
-  --text-2       : #c8d0e8;
-  --muted        : #9aaac8;
-  --brand        : #c4a888;
-  --brand-dark   : #d4b898;
-  --brand-subtle : #252030;
-  --purple       : #c4b4ff;
-  --success      : #6abf88;
-  --error        : #e08888;
-  --shadow-sm    : 0 0 0 1px rgba(255, 200, 160, 0.08);
-  --shadow-md    : 0 4px 20px rgba(5, 8, 20, 0.5), 0 0 0 1px rgba(255, 200, 160, 0.06);
-  --shadow-lg    : 0 16px 48px rgba(5, 8, 20, 0.6), 0 0 0 1px rgba(255, 200, 160, 0.08);
-  --glow         : 0 0 40px rgba(160, 136, 120, 0.06);
-}
-
-/* ============================================================
-   RESET
-   ============================================================ */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin    : 0;
-  padding   : 0;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  font-family            : 'Inter', sans-serif;
-  background             : var(--bg);
-  color                  : var(--text);
-  min-height             : 100vh;
-  overflow-x             : hidden;
-  transition             : background 0.45s, color 0.3s;
-  -webkit-font-smoothing : antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering         : optimizeLegibility;
-}
-
-body::before {
-  content : '';
-  position: fixed;
-  inset   : 0;
-  background-image:
-    radial-gradient(ellipse at 20% 20%, rgba(139, 111, 94, 0.06) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 80%, rgba(124, 107, 158, 0.05) 0%, transparent 60%);
-  pointer-events: none;
-  z-index       : 0;
-  transition    : opacity 0.45s;
-}
-
-[data-theme="dark"] body::before {
-  background-image:
-    radial-gradient(ellipse at 20% 20%, rgba(90, 70, 60, 0.15) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 80%, rgba(80, 70, 120, 0.10) 0%, transparent 60%);
 }
 
 /* ============================================================
    THEME BAR
    ============================================================ */
-/* ============================================================
-   THEME TOGGLE — floating icon button
-   ============================================================ */
-.theme-toggle {
-  position       : fixed;
-  top            : 16px;
-  right          : 20px;
-  z-index        : 100;
-  width          : 38px;
-  height         : 38px;
-  border-radius  : 50%;
-  border         : 1.5px solid var(--border);
-  background     : var(--surface);
-  cursor         : pointer;
-  font-size      : 18px;
-  display        : flex;
-  align-items    : center;
-  justify-content: center;
-  box-shadow     : var(--shadow-sm);
-  transition     : all 0.2s;
-}
-
-.theme-toggle:hover {
-  border-color: var(--border-strong);
-  box-shadow  : var(--shadow-md);
-  transform   : scale(1.08);
-}
-
-/* Icon set via CSS based on current theme */
-[data-theme="warm"] .theme-toggle::before {
-  content: '🌙';
-}
-
-[data-theme="dark"] .theme-toggle::before {
-  content: '☀️';
-}
-
 /* ============================================================
    LAYOUT
    ============================================================ */
@@ -242,9 +135,7 @@ body::before {
   transition    : color 0.3s;
 }
 
-[data-theme="dark"] .header-eyebrow {
-  opacity: 1;
-}
+
 
 .header-logo {
   width     : 280px;
@@ -255,9 +146,7 @@ body::before {
   transition: filter 0.45s;
 }
 
-[data-theme="dark"] .header-logo {
-  filter: brightness(0) invert(1) opacity(0.88);
-}
+
 
 .header h1 {
   font-family  : 'Great Vibes', 'Great Vibes Fallback', cursive;
@@ -523,9 +412,7 @@ body::before {
 }
 
 /* --- Dark theme selected gets brighter glow --- */
-[data-theme="dark"] .slot-btn.selected {
-  box-shadow: 0 0 0 3px rgba(196, 180, 255, 0.25);
-}
+
 
 .slot-btn.booked {
   opacity   : 0.45;
@@ -573,10 +460,7 @@ body::before {
 }
 
 /* --- Dark theme: boost booked slot text contrast --- */
-[data-theme="dark"] .slot-btn.booked .slot-time-label,
-[data-theme="dark"] .slot-btn.booked .slot-status-label {
-  color: var(--text-2);
-}
+
 
 /* ============================================================
    BOOKING FORM
@@ -708,9 +592,7 @@ body::before {
   box-shadow  : 0 0 0 3px rgba(107, 90, 158, 0.15);
 }
 
-[data-theme="dark"] .radio-option:has(input:checked) {
-  box-shadow: 0 0 0 3px rgba(196, 180, 255, 0.15);
-}
+
 
 .radio-icon {
   font-size: 16px;
@@ -829,14 +711,9 @@ body::before {
 }
 
 /* --- Dark theme: stronger button contrast --- */
-[data-theme="dark"] .btn-submit {
-  background: #b89060;
-  color     : #fff;
-}
 
-[data-theme="dark"] .btn-submit:hover:not(:disabled) {
-  background: #c8a070;
-}
+
+
 
 .btn-submit:hover:not(:disabled) {
   background: var(--brand-dark);

@@ -1,5 +1,5 @@
 // --- Config ---
-const API_URL = 'https://script.google.com/macros/s/AKfycbx3WYmRXdpspcmVwFWDt5JiU-T7iBUDugls6EUS09YIjZtZxy6XOleSZZSjaSSQWtMsGg/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbx7IAq3iUs6y6FjjurXGKCcjJSrj-Hy4_FOVyAmGOSqpDN_JRJ_JngLtdaLwYBrdkuHRw/exec';
 
 // --- State ---
 let slots        = [];
@@ -20,25 +20,6 @@ async function api(params) {
 }
 
 // --- Theme ---
-// --- Toggle theme ---
-function toggleTheme() {
-  const current = document.documentElement.getAttribute('data-theme');
-  const next    = current === 'warm' ? 'dark' : 'warm';
-  document.documentElement.setAttribute('data-theme', next);
-  localStorage.setItem('jana-theme', next);
-  // --- Update aria-label ---
-  const btn = document.getElementById('themeToggle');
-  if (btn) btn.setAttribute('aria-label', next === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro');
-}
-
-// --- Init theme on load ---
-function initTheme() {
-  const saved = localStorage.getItem('jana-theme');
-  const theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'warm');
-  document.documentElement.setAttribute('data-theme', theme);
-  const btn = document.getElementById('themeToggle');
-  if (btn) btn.setAttribute('aria-label', theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro');
-}
 
 // --- Fix 2: Restore admin session on page load ---
 function restoreAdminSession() {
@@ -113,7 +94,6 @@ function formatTimeDisplay(timeVal) {
   return m === '00' ? `${h}h` : `${h}h${m}`;
 }
 // --- Init ---
-initTheme();
 checkCancelToken();
 loadSlots();
 restoreAdminSession();
