@@ -536,7 +536,9 @@
 }
 
 .field label {
-  display       : block;
+  display       : flex;
+  align-items   : center;
+  gap           : 6px;
   font-size     : 11px;
   font-weight   : 500;
   letter-spacing: 0.1em;
