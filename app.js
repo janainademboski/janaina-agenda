@@ -554,7 +554,9 @@ function renderAdminSlots() {
             ${slot.status === 'available' ? 'Bloquear' : 'Liberar'}
           </button>
           <button class="btn-icon btn-edit" title="Editar" onclick="startEditSlot('${slot.id}')"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-          <button class="btn-icon btn-delete" title="Deletar" onclick="startDeleteSlot('${slot.id}')"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+          ${slot.status === 'booked'
+            ? '<span style="font-size:11px;color:var(--error);margin-left:4px;" title="Cliente agendado — não pode deletar">🔒 Reservado</span>'
+            : '<button class="btn-icon btn-delete" title="Deletar" onclick="startDeleteSlot(\''+slot.id+'\')" ><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>'}
         </div>
       </div>`;
   }).join('');
@@ -689,6 +691,10 @@ function startToggleSlotStatus(id, currentStatus) {
 function startDeleteSlot(id) {
   const slot = slots.find(s => s.id === id);
   if (!slot) return;
+  if (slot.status === 'booked') {
+    alert('Este horário tem um cliente agendado e não pode ser deletado. Cancele o agendamento primeiro.');
+    return;
+  }
   const d   = parseDate(slot.date);
   const lbl = d ? `${d.getDate()} de ${MONTHS[d.getMonth()]} · ${slot.time}` : slot.time;
   const row = document.getElementById(`row-${id}`);
@@ -752,17 +758,17 @@ function renderAdminBookings(bookings) {
   const sorted = [...bookings].reverse();
   el.innerHTML = sorted.map(b => {
     const tipoIcon = b.tipo
-      ? (b.tipo.includes('Online') ? '💻' : '📍')
+      ? (b.tipo.includes('Online') ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;stroke:var(--brand)"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;stroke:var(--brand)"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>')
       : '';
     return `
     <div class="booking-row">
       <div class="booking-slot-id">${b.slotId}</div>
       <div class="booking-details">
         <strong>${b.name}</strong><br/>
-        📱 ${b.whatsapp}<br/>
-        ✉️ ${b.email}<br/>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;stroke:var(--muted)"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>${b.whatsapp}<br/>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;stroke:var(--muted)"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>${b.email}<br/>
         ${b.tipo     ? `${tipoIcon} ${b.tipo}<br/>`       : ''}
-        ${b.message  ? `💬 ${b.message}<br/>`             : ''}
+        ${b.message  ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;stroke:var(--muted)"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>${b.message}<br/>`             : ''}
         <span style="font-size:11px;color:var(--muted);">${formatTimestamp(b.timestamp)}</span>
       </div>
     </div>`;
@@ -824,14 +830,19 @@ async function addSlot() {
       return;
     }
   }
-
-  // --- Format time for display (20:00 → 20h, 20:30 → 20h30) ---
+ 
+  // --- Check for duplicate slot (same date + time) ---
   const time = formatTimeDisplay(timeVal);
-
+  const duplicate = slots.find(s => s.date === date && s.time === time);
+  if (duplicate) {
+    showMsg(msgEl, 'error', 'Já existe um horário cadastrado para esta data e hora.');
+    return;
+  }
+ 
   // --- Fix 3: Prevent double-click ---
   btn.disabled    = true;
   btn.textContent = 'Processando...';
-
+ 
   try {
     const data = await api({ action: 'adminAddSlot', password: adminPass, id, day, time, date });
     if (data.success) {
@@ -856,7 +867,7 @@ async function addSlot() {
     btn.textContent = '+ Adicionar horário';
   }
 }
-
+ 
 // --- Helper ---
 function showMsg(el, type, text) {
   el.className     = `message ${type}`;
