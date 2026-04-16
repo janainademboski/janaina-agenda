@@ -722,11 +722,13 @@ function renderAdminSlots() {
       : `${slot.day} · ${slot.time}`;
     // --- Look up first name from bookings if slot is booked ---
     const patientName = slot.status === 'booked'
-      ? (() => { const b = bookings.find(b => b.slotId === slot.id); return b ? b.name : ''; })()
+      ? (() => { const b = bookings.find(b => b.slotId === slot.id); return b ? b.name : 'bloqueado'; })()
       : '';
     return `
       <div class="admin-slot-row" id="row-${slot.id}">
-        <span class="admin-slot-label"><strong>${slot.day}</strong> — ${lbl}${patientName ? `<span class="slot-patient-name">${patientName}</span>` : ''}</span>
+        <span class="admin-slot-label"><strong>${slot.day}</strong> — ${lbl}${patientName === 'bloqueado' 
+          ? '<span class="slot-patient-name" style="color:var(--muted);">Bloqueado por Janaína</span>' 
+          : patientName ? `<span class="slot-patient-name">${patientName}</span>` : ''}</span>
         <span class="slot-status-pill ${slot.status}">${slot.status === 'available' ? 'Livre' : 'Reservado'}</span>
         <div class="admin-slot-actions">
           <button class="btn-small ${slot.status === 'available' ? 'danger' : 'success-btn'}"
