@@ -26,15 +26,17 @@ function restoreAdminSession() {
   if (!adminPass) return;
   api({ action: 'adminGetBookings', password: adminPass }).then(data => {
     if (data.success) {
-      document.getElementById('adminLogin').style.display   = 'none';
-      document.getElementById('adminContent').style.display = 'block';
-      // --- Fix 3: Re-open panel if it was open before refresh ---
-      const wasOpen = sessionStorage.getItem('jana-admin-open') === 'true';
-      if (wasOpen) {
-        document.getElementById('adminPanel').classList.add('open');
-        renderAdminBookings(data.bookings);
-        renderAdminSlots();
+      const loginEl   = document.getElementById('adminLogin');
+      const contentEl = document.getElementById('adminContent');
+      if (loginEl)   loginEl.style.display   = 'none';
+      if (contentEl) contentEl.style.display = 'block';
+      const panel = document.getElementById('adminPanel');
+      if (panel) {
+        const wasOpen = sessionStorage.getItem('jana-admin-open') === 'true';
+        if (wasOpen) panel.classList.add('open');
       }
+      renderAdminBookings(data.bookings);
+      renderAdminSlots();
     } else {
       sessionStorage.removeItem('jana-admin-pass');
       sessionStorage.removeItem('jana-admin-open');

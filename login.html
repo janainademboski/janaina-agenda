@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Painel Administrativo — Janaína Demboski</title>
+  <meta name="robots" content="noindex, nofollow"/>
+  <link rel="icon" type="image/jpeg" href="og-image.jpg"/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    body { background: var(--bg); min-height: 100vh; }
+    .login-page { max-width: 860px; margin: 0 auto; padding: 40px 20px 80px; }
+    .login-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .login-logo {
+      font-family: 'Great Vibes', 'Great Vibes Fallback', cursive;
+      font-size: clamp(2rem, 5vw, 3rem);
+      color: var(--text);
+      margin-bottom: 0.25rem;
+    }
+    .login-sub {
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .back-link {
+      display: inline-block;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      margin-bottom: 1.5rem;
+      transition: color 0.25s;
+    }
+    .back-link:hover { color: var(--brand); }
+    .admin-panel-page {
+      background  : var(--surface);
+      border      : 1.5px solid var(--border);
+      border-radius: 8px;
+      padding     : 28px 24px;
+      box-shadow  : var(--shadow-md);
+    }
+    .panel-title {
+      font-family  : 'Playfair Display', serif;
+      font-size    : 1.4rem;
+      font-weight  : 400;
+      color        : var(--text);
+      margin-bottom: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-page">
+    <a href="../" class="back-link">← Voltar ao site</a>
+
+    <div class="login-header">
+      <div class="login-logo">Janaína Demboski</div>
+      <div class="login-sub">Área Administrativa · CRP 01/31035</div>
+    </div>
+
+    <div class="admin-panel-page">
+      <div class="panel-title">Painel da Janaína</div>
+
+      <div id="adminLogin">
+        <div class="admin-login">
+          <input type="password" id="adminPassword" placeholder="Senha"
+            onkeyup="if(event.key==='Enter') adminAuth();"/>
+          <button class="btn-small" onclick="adminAuth()">Entrar</button>
+        </div>
+        <div class="message" id="adminLoginMsg"></div>
+      </div>
+
+      <div id="adminContent" style="display:none;">
+        <div class="admin-tabs">
+          <button class="admin-tab active" id="tabHorarios" onclick="switchTab('horarios')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            Horários
+          </button>
+          <button class="admin-tab" id="tabAgendamentos" onclick="switchTab('agendamentos')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Agendamentos
+          </button>
+        </div>
+
+        <!-- Tab: Horários -->
+        <div id="tabContentHorarios">
+          <div style="margin-top:16px;">
+            <div class="section-label" style="margin-bottom:12px;">Gerenciar horários</div>
+            <div class="slots-scroll">
+              <div id="adminSlotsList"></div>
+            </div>
+          </div>
+
+          <div class="add-slot-form">
+            <h4>Adicionar horários</h4>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <button class="btn-admin" onclick="bulkPrevWeek()" style="padding:4px 10px;">←</button>
+              <span id="bulkWeekLabel" style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);"></span>
+              <button class="btn-admin" onclick="bulkNextWeek()" style="padding:4px 10px;">→</button>
+            </div>
+
+            <div id="bulkDaysGrid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-bottom:12px;"></div>
+
+            <div class="add-slot-inputs" style="grid-template-columns:1fr;margin-bottom:10px;">
+              <div class="add-slot-field">
+                <label class="add-slot-label">Horário <span class="required">*</span></label>
+                <select id="bulkSlotTime" onchange="updateBulkPreview()">
+                  <option value="">Selecione...</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="bulkPreview" style="background:var(--surface-2);border-radius:5px;padding:8px 12px;font-size:12px;color:var(--muted);margin-bottom:10px;min-height:34px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
+              <span style="font-size:11px;">Selecione os dias e o horário</span>
+            </div>
+
+            <button class="btn-small success-btn" id="bulkAddBtn" onclick="addBulkSlots()" disabled style="opacity:0.5;">
+              + Adicionar horários
+            </button>
+            <div class="message" id="addSlotMsg"></div>
+
+            <input type="hidden" id="newSlotId"/>
+            <input type="hidden" id="newSlotDay"/>
+            <input type="hidden" id="newSlotDate"/>
+            <input type="hidden" id="newSlotTime"/>
+          </div>
+        </div>
+
+        <!-- Tab: Agendamentos -->
+        <div id="tabContentAgendamentos" style="display:none;">
+          <div style="margin-top:16px;">
+            <div class="section-label" style="margin-bottom:12px;">Agendamentos recebidos</div>
+            <div class="bookings-scroll">
+              <div id="adminBookingsList"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
