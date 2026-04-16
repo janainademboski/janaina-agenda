@@ -509,21 +509,21 @@ async function confirmCancel() {
       if (typeof gtag !== 'undefined') {
         gtag('event', 'booking_cancelled');
       }
-      document.getElementById('cancelIcon').textContent  = '✅';
+      document.getElementById('cancelIcon').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#4a7a5a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:48px;height:48px"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>';
       document.getElementById('cancelTitle').textContent = 'Agendamento cancelado!';
       document.getElementById('cancelMsg').textContent   =
         'Seu agendamento foi cancelado com sucesso. Você receberá um e-mail de confirmação em breve.';
       document.getElementById('cancelActions').innerHTML =
         `<a class="btn-new-booking" href="${window.location.pathname}" style="display:inline-block;margin-top:16px;text-decoration:none;">Fazer novo agendamento</a>`;
     } else if (data.error === 'already_cancelled') {
-      document.getElementById('cancelIcon').textContent  = '⚠️';
+      document.getElementById('cancelIcon').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#a06a5a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:48px;height:48px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
       document.getElementById('cancelTitle').textContent = 'Já cancelado';
       document.getElementById('cancelMsg').textContent   =
         'Este agendamento já foi cancelado anteriormente ou o link não é mais válido.';
       document.getElementById('cancelActions').innerHTML =
         `<a class="btn-new-booking" href="${window.location.pathname}" style="display:inline-block;margin-top:16px;text-decoration:none;">Voltar à agenda</a>`;
     } else {
-      document.getElementById('cancelIcon').textContent  = '⚠️';
+      document.getElementById('cancelIcon').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#a06a5a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:48px;height:48px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
       document.getElementById('cancelTitle').textContent = 'Link inválido';
       document.getElementById('cancelMsg').textContent   =
         'Este link de cancelamento não é válido ou já foi utilizado.';
