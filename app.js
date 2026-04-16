@@ -318,7 +318,8 @@ async function loadSlots() {
       });
     const skeleton = document.getElementById('skeletonLoader');
     if (skeleton) skeleton.style.display = 'none';
-    renderCalendar();
+    const isAdminPage = !document.getElementById('calendarContainer');
+    if (!isAdminPage) renderCalendar();
     // --- Re-render admin slots if already logged in ---
     const adminContentEl = document.getElementById('adminContent');
     if (adminPass && adminContentEl && adminContentEl.style.display === 'block') {
@@ -1257,3 +1258,10 @@ function showMsg(el, type, text) {
   el.textContent   = text;
   el.style.display = 'block';
 }
+
+
+
+
+
+
+
