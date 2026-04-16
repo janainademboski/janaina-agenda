@@ -81,7 +81,18 @@ function populateTimeDropdown() {
   if (bulkSelect) bulkSelect.innerHTML = opts;
 }
  
-// ----- Bulk slot add (Option 2) -----
+async function atualizarSlots() {
+  const icon = document.getElementById('atualizarIcon');
+  const btn  = document.getElementById('atualizarBtn');
+  if (icon) icon.classList.add('spinning');
+  if (btn)  btn.disabled = true;
+  await loadSlots();
+  renderAdminSlots();
+  if (icon) icon.classList.remove('spinning');
+  if (btn)  btn.disabled = false;
+}
+ 
+ 
 let bulkWeekStart = null;
 const DAY_ABBR = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
  

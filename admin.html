@@ -9,6 +9,8 @@
   <link rel="stylesheet" href="style.css"/>
   <style>
     body { background: var(--bg); min-height: 100vh; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinning { animation: spin 0.7s linear infinite; }
     .login-page { max-width: 860px; margin: 0 auto; padding: 40px 20px 80px; }
     .login-header {
       text-align: center;
@@ -107,8 +109,8 @@
           <div style="margin-top:16px;">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
               <div class="section-label" style="margin:0;">Gerenciar horários</div>
-              <button class="btn-admin" onclick="loadSlots().then(()=>renderAdminSlots())" title="Atualizar horários" style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+              <button class="btn-admin" id="atualizarBtn" onclick="atualizarSlots()" title="Atualizar horários" style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;">
+                <svg id="atualizarIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="13" height="13" style="transition:transform 0.3s;"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
                 Atualizar
               </button>
             </div>
