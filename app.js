@@ -46,17 +46,166 @@ function restoreAdminSession() {
 // --- Populate time dropdown with 15min intervals ---
 function populateTimeDropdown() {
   const select = document.getElementById('newSlotTime');
-  select.innerHTML = '<option value="">Selecione...</option>';
-  for (let h = 6; h < 23; h++) {
-    for (let m = 0; m < 60; m += 15) {
-      const hh  = String(h).padStart(2, '0');
-      const mm  = String(m).padStart(2, '0');
-      const val = `${hh}:${mm}`;
-      const lbl = `${hh}h${mm === '00' ? '' : mm}`;
-      select.innerHTML += `<option value="${val}">${lbl}</option>`;
+  const bulkSelect = document.getElementById('bulkSlotTime');
+  const opts = '<option value="">Selecione...</option>' + (() => {
+    let html = '';
+    for (let h = 6; h < 23; h++) {
+      for (let m = 0; m < 60; m += 15) {
+        const hh  = String(h).padStart(2, '0');
+        const mm  = String(m).padStart(2, '0');
+        const val = `${hh}:${mm}`;
+        const lbl = `${hh}h${mm === '00' ? '' : mm}`;
+        html += `<option value="${val}">${lbl}</option>`;
+      }
     }
-  }
+    return html;
+  })();
+  if (select) select.innerHTML = opts;
+  if (bulkSelect) bulkSelect.innerHTML = opts;
 }
+ 
+// ----- Bulk slot add (Option 2) -----
+let bulkWeekStart = null;
+const DAY_ABBR = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+ 
+function getMonday(d) {
+  const date = new Date(d);
+  const dow  = date.getDay();
+  const diff = dow === 0 ? -6 : 1 - dow;
+  date.setDate(date.getDate() + diff);
+  date.setHours(0,0,0,0);
+  return date;
+}
+ 
+function initBulkWeek() {
+  bulkWeekStart = getMonday(new Date());
+  renderBulkGrid();
+}
+ 
+function bulkPrevWeek() { bulkWeekStart.setDate(bulkWeekStart.getDate() - 7); renderBulkGrid(); }
+function bulkNextWeek() { bulkWeekStart.setDate(bulkWeekStart.getDate() + 7); renderBulkGrid(); }
+ 
+function renderBulkGrid() {
+  const grid  = document.getElementById('bulkDaysGrid');
+  const label = document.getElementById('bulkWeekLabel');
+  if (!grid) return;
+ 
+  const endDate = new Date(bulkWeekStart);
+  endDate.setDate(endDate.getDate() + 5);
+  const fmt = d => `${d.getDate()} ${MONTHS[d.getMonth()].substring(0,3)}`;
+  label.textContent = `${fmt(bulkWeekStart)} – ${fmt(endDate)} de ${bulkWeekStart.getFullYear()}`;
+ 
+  grid.innerHTML = '';
+  const today = new Date(); today.setHours(0,0,0,0);
+ 
+  for (let i = 0; i < 6; i++) {
+    const day  = new Date(bulkWeekStart);
+    day.setDate(day.getDate() + i);
+    const isPast = day < today;
+    const yyyy = day.getFullYear();
+    const mm   = String(day.getMonth()+1).padStart(2,'0');
+    const dd   = String(day.getDate()).padStart(2,'0');
+    const dateStr = `${yyyy}-${mm}-${dd}`;
+    const dayName = DAY_ABBR[day.getDay()];
+ 
+    const btn = document.createElement('div');
+    btn.className = 'bulk-day-btn' + (isPast ? ' bulk-past' : '');
+    btn.dataset.date = dateStr;
+    btn.dataset.day  = DAYS_FULL[day.getDay()].split('-')[0];
+    btn.innerHTML    = `<span class="bulk-abbr">${dayName}</span><span class="bulk-num">${day.getDate()}</span>`;
+    if (!isPast) btn.onclick = () => { btn.classList.toggle('bulk-selected'); updateBulkPreview(); };
+    grid.appendChild(btn);
+  }
+  updateBulkPreview();
+}
+ 
+function updateBulkPreview() {
+  const preview = document.getElementById('bulkPreview');
+  const btn     = document.getElementById('bulkAddBtn');
+  const timeVal = document.getElementById('bulkSlotTime').value;
+  const timeLbl = formatTimeDisplay(timeVal);
+  const selected = document.querySelectorAll('.bulk-day-btn.bulk-selected');
+ 
+  if (!selected.length || !timeVal) {
+    preview.innerHTML = '<span style="font-size:11px;">Selecione os dias e o horário</span>';
+    btn.disabled = true; btn.style.opacity = '0.5';
+    return;
+  }
+ 
+  const tags = Array.from(selected).map(el => {
+    const d = parseDate(el.dataset.date);
+    return `<span style="background:#f7efed;border:0.5px solid #e4d0ca;border-radius:4px;padding:3px 8px;font-size:11px;color:#855447;">${el.dataset.day} ${d.getDate()}/${String(d.getMonth()+1).padStart(2,'0')} · ${timeLbl}</span>`;
+  }).join('');
+ 
+  preview.innerHTML = tags;
+  btn.disabled = false; btn.style.opacity = '1';
+  btn.innerHTML = `+ Adicionar ${selected.length} horário${selected.length > 1 ? 's' : ''}`;
+}
+ 
+async function addBulkSlots() {
+  const timeVal  = document.getElementById('bulkSlotTime').value;
+  const timeLbl  = formatTimeDisplay(timeVal);
+  const selected = Array.from(document.querySelectorAll('.bulk-day-btn.bulk-selected'));
+  const msgEl    = document.getElementById('addSlotMsg');
+  const btn      = document.getElementById('bulkAddBtn');
+ 
+  if (!selected.length || !timeVal) return;
+ 
+  btn.disabled = true; btn.innerHTML = 'Adicionando...';
+ 
+  // Check duplicates first
+  const duplicates = selected.filter(el => {
+    const d = parseDate(el.dataset.date);
+    return slots.find(s => {
+      const sd = parseDate(s.date);
+      return sd && d &&
+        sd.getFullYear() === d.getFullYear() &&
+        sd.getMonth()    === d.getMonth() &&
+        sd.getDate()     === d.getDate() &&
+        s.time.trim()    === timeLbl.trim();
+    });
+  });
+ 
+  if (duplicates.length) {
+    const lbls = duplicates.map(el => el.dataset.day).join(', ');
+    showMsg(msgEl, 'error', `Horário ${timeLbl} já existe para: ${lbls}`);
+    btn.disabled = false; btn.innerHTML = `+ Adicionar ${selected.length} horários`;
+    return;
+  }
+ 
+  let added = 0;
+  for (const el of selected) {
+    const dateVal  = el.dataset.date;
+    const dayName  = el.dataset.day;
+    const timeClean = timeVal.replace(':', 'h').replace('h00', 'h');
+    const id       = `${dateVal}-${timeClean}`;
+ 
+    try {
+      const data = await api({ action: 'adminAddSlot', password: adminPass, id, day: dayName, time: timeLbl, date: dateVal });
+      if (data.success) {
+        slots.push({ id, day: dayName, time: timeLbl, date: dateVal, status: 'available' });
+        added++;
+      }
+    } catch(e) {}
+  }
+ 
+  if (added > 0) {
+    slots.sort((a,b) => { const da = parseDate(a.date), db = parseDate(b.date); if (!da) return 1; if (!db) return -1; if (da-db !== 0) return da-db; return (a.time||'').localeCompare(b.time||''); });
+    renderCalendar();
+    renderAdminSlots();
+    // Deselect all
+    document.querySelectorAll('.bulk-day-btn.bulk-selected').forEach(b => b.classList.remove('bulk-selected'));
+    document.getElementById('bulkSlotTime').value = '';
+    updateBulkPreview();
+    showMsg(msgEl, 'success', `${added} horário${added > 1 ? 's adicionados' : ' adicionado'} com sucesso!`);
+  } else {
+    showMsg(msgEl, 'error', 'Erro ao adicionar. Tente novamente.');
+  }
+ 
+  btn.disabled = false; btn.innerHTML = '+ Adicionar horários';
+}
+ 
+ 
  
 // --- Auto-fill Day and ID when date changes ---
 function onSlotDateChange() {
@@ -98,6 +247,7 @@ checkCancelToken();
 loadSlots();
 restoreAdminSession();
 populateTimeDropdown();
+initBulkWeek();
 initDatePicker();
  
 // --- Set min date on date picker to today ---

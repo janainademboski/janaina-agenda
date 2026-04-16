@@ -1113,6 +1113,51 @@ body {
   margin-bottom: 1.5rem;
 }
 
+.bulk-day-btn {
+  border       : 0.5px solid var(--border);
+  border-radius: 5px;
+  padding      : 8px 4px;
+  text-align   : center;
+  cursor       : pointer;
+  transition   : all 0.15s;
+  background   : var(--surface);
+}
+
+.bulk-day-btn:hover { border-color: var(--brand); }
+
+.bulk-day-btn.bulk-selected {
+  background   : var(--brand-subtle);
+  border-color : var(--brand);
+  border-width : 1.5px;
+}
+
+.bulk-day-btn.bulk-past {
+  opacity       : 0.35;
+  cursor        : not-allowed;
+  pointer-events: none;
+}
+
+.bulk-abbr {
+  display      : block;
+  font-size    : 9px;
+  font-weight  : 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color        : var(--muted);
+  margin-bottom: 3px;
+}
+
+.bulk-selected .bulk-abbr { color: var(--brand); }
+
+.bulk-num {
+  display    : block;
+  font-size  : 14px;
+  font-weight: 500;
+  color      : var(--text);
+}
+
+.bulk-selected .bulk-num { color: var(--brand); }
+
 .admin-month-label {
   font-size     : 10px;
   font-weight   : 600;
@@ -1575,7 +1620,5 @@ body {
   fill           : none;
   flex-shrink    : 0;
 }
-
-/* btn-small flex defined above */
 
 }
