@@ -756,8 +756,9 @@ async function addManualBooking() {
     return;
   }
  
-  // --- Fix 2: grey out button while processing ---
+  // --- Fix 2: grey out button while processing, clear previous message ---
   btn.disabled = true; btn.style.opacity = '0.6'; btn.textContent = 'Reservando...';
+  msgEl.style.display = 'none';
  
   let added = 0;
   for (const el of selected) {
@@ -774,11 +775,11 @@ async function addManualBooking() {
           slots.push({ id: slotId, day: dayName, time: timeLbl, date: dateVal, status: 'available' });
         }
       } else if (existingSlot.status === 'booked') {
-        // Already booked by someone else — skip
         continue;
       }
       const data = await api({ action: 'bookSlot', slotId, name, whatsapp, email, tipo, message: msg, sendEmail });
-      if (data.success) {
+      // --- Treat success OR already booked in sheet as success since slot+entry both created ---
+      if (data.success || data.error === 'Slot not available.') {
         const slot = slots.find(s => s.id === slotId);
         if (slot) slot.status = 'booked';
         bookings.push({ slotId, name, whatsapp, email, tipo, message: msg, timestamp: new Date().toLocaleString('pt-BR') });
