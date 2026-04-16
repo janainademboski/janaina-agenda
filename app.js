@@ -3,6 +3,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbwpUudEWOYUi3ujZXSaHNwf
 
 // --- State ---
 let slots        = [];
+let bookings     = [];
 let selectedSlot = null;
 let adminPass    = sessionStorage.getItem('jana-admin-pass') || ''; // Fix 2: persist session
  
@@ -707,9 +708,13 @@ function renderAdminSlots() {
     const lbl = d
       ? `${d.getDate()} de ${MONTHS[d.getMonth()]} de ${d.getFullYear()} · ${slot.time}`
       : `${slot.day} · ${slot.time}`;
+    // --- Look up first name from bookings if slot is booked ---
+    const patientName = slot.status === 'booked'
+      ? (() => { const b = bookings.find(b => b.slotId === slot.id); return b ? b.name.split(' ')[0] : ''; })()
+      : '';
     return `
       <div class="admin-slot-row" id="row-${slot.id}">
-        <span class="admin-slot-label"><strong>${slot.day}</strong> — ${lbl}</span>
+        <span class="admin-slot-label"><strong>${slot.day}</strong> — ${lbl}${patientName ? `<span class="slot-patient-name">${patientName}</span>` : ''}</span>
         <span class="slot-status-pill ${slot.status}">${slot.status === 'available' ? 'Livre' : 'Reservado'}</span>
         <div class="admin-slot-actions">
           <button class="btn-small ${slot.status === 'available' ? 'danger' : 'success-btn'}"
@@ -913,7 +918,9 @@ function formatTimestamp(ts) {
   return s;
 }
  
-function renderAdminBookings(bookings) {
+function renderAdminBookings(data) {
+  bookings = data || [];
+  renderAdminSlots();
   const el = document.getElementById('adminBookingsList');
   // --- Update tab badge count ---
   const tab = document.getElementById('tabAgendamentos');

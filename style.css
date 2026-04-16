@@ -1209,14 +1209,19 @@ body {
 .btn-edit:hover svg { stroke: var(--brand); }
 .btn-delete:hover svg { stroke: var(--error); }
 
-.admin-slot-row:hover .btn-icon {
-  opacity: 1;
+.admin-slot-row:hover .btn-icon { opacity: 1; }
+
+.slot-patient-name {
+  display    : block;
+  font-size  : 10px;
+  color      : var(--brand);
+  margin-top : 2px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
 }
 
 @media (max-width: 640px) {
-  .btn-icon {
-    opacity: 0.7;
-  }
+  .btn-icon { opacity: 1; }
 }
 
 .btn-edit:hover {
@@ -1620,5 +1625,7 @@ body {
   fill           : none;
   flex-shrink    : 0;
 }
+
+/* btn-small flex defined above */
 
 }
