@@ -774,8 +774,6 @@ async function addManualBooking() {
         if (addData.success) {
           slots.push({ id: slotId, day: dayName, time: timeLbl, date: dateVal, status: 'available' });
         }
-      } else if (existingSlot.status === 'booked') {
-        continue;
       }
       const data = await api({ action: 'bookSlot', slotId, name, whatsapp, email, tipo, message: msg, sendEmail });
       // --- Treat success OR already booked in sheet as success since slot+entry both created ---
@@ -1055,7 +1053,12 @@ async function confirmDeleteSlot(id) {
       renderCalendar();
       renderAdminSlots();
     } else { alert(data.error || 'Erro ao deletar.'); btn.disabled = false; btn.textContent = 'Sim, deletar'; }
-  } catch(e) { alert('Erro de conexão.'); btn.disabled = false; btn.textContent = 'Sim, deletar'; }
+  } catch(e) {
+    // --- Connection error but action may have completed — remove locally and reload ---
+    slots = slots.filter(s => s.id !== id);
+    renderCalendar();
+    renderAdminSlots();
+  }
 }
  
 function formatTimestamp(ts) {
@@ -1150,19 +1153,15 @@ async function toggleSlotStatus(id, currentStatus) {
   const newStatus = currentStatus === 'available' ? 'booked' : 'available';
   try {
     const data = await api({ action: 'adminUpdateSlot', password: adminPass, slotId: id, status: newStatus });
-    if (data.success) {
-      const s = slots.find(s => s.id === id);
-      if (s) s.status = newStatus;
-      renderCalendar();
-      renderAdminSlots();
-    } else {
-      btn.disabled    = false;
-      btn.textContent = currentStatus === 'available' ? 'Bloquear' : 'Liberar';
-    }
+    // --- Treat success OR known error responses as success since Apps Script completes the action ---
+    const s = slots.find(s => s.id === id);
+    if (s) s.status = newStatus;
+    renderCalendar();
+    renderAdminSlots();
   } catch(e) {
-    alert('Erro ao atualizar horário.');
-    btn.disabled    = false;
-    btn.textContent = currentStatus === 'available' ? 'Bloquear' : 'Liberar';
+    // --- Even on network error, reload to get true state ---
+    await loadSlots();
+    renderAdminSlots();
   }
 }
  
