@@ -813,6 +813,9 @@ async function addManualBooking() {
     showMsg(msgEl, 'error', 'Erro ao reservar. Verifique os horários e tente novamente.');
   }
   btn.disabled = false; btn.style.opacity = '1'; btn.textContent = '+ Reservar horários';
+}
+
+// --- Admin ---
 function toggleAdmin() {
   const panel  = document.getElementById('adminPanel');
   const btn    = document.querySelector('.btn-admin');
