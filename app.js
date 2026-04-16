@@ -9,7 +9,7 @@ let adminPass    = sessionStorage.getItem('jana-admin-pass') || ''; // Fix 2: pe
 
 // --- Safe calendar render — skips on admin page ---
 function safeRenderCalendar() {
-  if (document.getElementById('calendarContainer')) safeRenderCalendar();
+  if (document.getElementById('calendarContainer')) renderCalendar();
 }
 
 // --- Portuguese labels ---
